@@ -61,8 +61,8 @@ class PageOne(tk.Frame):
         a.plot([1,2,3,4,5,6,7,8],[5,6,7,3,4,5,6,9])
 
         canvas = FigureCanvasTkAgg(f, self)
-        canvas.show()
-        canvas.get_tk_widget().pack(side=t.TOP, fill=tk.BOTH, expand= True)
+        canvas.draw()
+        canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand= True)
 
 app = DuinGroeiApp()
 app.mainloop()

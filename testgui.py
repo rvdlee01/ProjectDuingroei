@@ -15,7 +15,7 @@ class DuinGroeiApp(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
 
-        tk.Tk.iconbitmap(self, default="dune_icon.ico")
+        # tk.Tk.iconbitmap(self, default="dune_icon.ico")
         tk.Tk.wm_title(self, "DuinHoogte")
 
         container = tk.Frame(self)

@@ -8,8 +8,10 @@ from keras.models import Sequential
 from keras.models import Model
 from keras.layers import Dense
 from sklearn.preprocessing import StandardScaler
-from sklearn.preprocessing import Normalizer
 from sklearn.model_selection import train_test_split
+
+#temp
+from sklearn.metrics import r2_score
 
 def createCSV(filename):
     myCSV = pd.read_csv(filename, skipinitialspace=True)  
@@ -39,6 +41,7 @@ ynorm = StandardScaler()
 
 x_train=xnorm.fit_transform(x_train)
 x_test=xnorm.transform(x_test)
+print(x_train)
 y_train=ynorm.fit_transform(np.array(y_train).reshape(-1,1))
 y_test=ynorm.transform(np.array(y_test).reshape(-1,1))
 
@@ -69,6 +72,8 @@ plt.show()
 # Estimate model performance
 trainingScore = model.evaluate(x_train, y_train, verbose=0)
 print('Accuracy: %.2f' % (trainingScore*100))
+print('r2 score for training: ', r2_score(y_train, trainPredict))
+print('r2 score for testing: ', r2_score(y_test, testPredict))
 print('Training Score is : %.2f MSE (%.2f RMSE)' % (trainingScore, math.sqrt(trainingScore)))
 testingScore = model.evaluate(x_test, y_test, verbose=0)
 print('Testing Score is  : %.2f MSE (%.2f RMSE)' % (testingScore, math.sqrt(testingScore)))

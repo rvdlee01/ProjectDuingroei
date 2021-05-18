@@ -7,15 +7,18 @@ import calendar
 from keras.models import Sequential
 from keras.models import Model
 from keras.layers import Dense
+from keras.layers import LSTM
+from keras.layers import Dropout
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 
 #temp
 from sklearn.metrics import r2_score
 
+# Get weather data file from https://www.knmi.nl/nederland-nu/klimatologie/daggegevens
 def createCSV(filename):
     myCSV = pd.read_csv(filename, skipinitialspace=True)  
-    columns = myCSV[['YYYYMMDD','TN','TX','TG','FHN','FHX','FG','DDVEC']]
+    columns = myCSV[['YYYYMMDD','TN','TX','TG','FHN','FHX','FG','RH','PG','UG','DDVEC']] 
     df = columns.copy()
     
     df = df.fillna(0)
@@ -28,13 +31,16 @@ def readCSV(filename):
     df = pd.read_csv(filename, skipinitialspace=True)
     return df
 
-#df = createCSV('WeatherHVH.csv')
+df = createCSV('weather.csv')
 df = readCSV('WindData.csv')
-x = df[['TN','TX','TG','FG','DDVEC']]
+x = df[['TG','PG','UG','FG','DDVEC']] #RH
 y = df[['FHX']]
 
 # 90% training data & 10% testing data
-x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.15, random_state=4)
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.1, random_state=5, shuffle=False)
+#x_train, x_test, y_train, y_test = x[1:8343], x[8343:],x[1:8343], x[8343:]
+#0,9 x 9269 = 8343
+#0,1 x 9269 = 927
 
 xnorm = StandardScaler()
 ynorm = StandardScaler()
@@ -46,15 +52,15 @@ y_train=ynorm.fit_transform(np.array(y_train).reshape(-1,1))
 y_test=ynorm.transform(np.array(y_test).reshape(-1,1))
 
 model = Sequential()
-model.add(Dense(32, input_dim=5, activation='relu'))
+model.add(Dense(256, input_dim=5, activation='relu'))
+model.add(Dense(128, activation='relu'))
+model.add(Dense(64, activation='relu'))
+model.add(Dense(32, activation='relu'))
 model.add(Dense(16, activation='relu'))
-model.add(Dense(8, activation='relu'))
-model.add(Dense(4, activation='relu'))
 model.add(Dense(1))
 model.compile(loss='mse', optimizer='adam')
 #print(model.summary())
-
-model.fit(x_train,y_train, epochs=200, batch_size=1000, verbose=0)
+model.fit(x_train,y_train, epochs=250, batch_size=6000, verbose=0)
 
 # predictions 
 trainPredict = model.predict(x_train)

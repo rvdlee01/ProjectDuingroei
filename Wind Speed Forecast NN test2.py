@@ -71,34 +71,42 @@ model.fit(x_train,y_train, epochs=300, batch_size=6000, verbose=0, shuffle=False
 trainPredict = model.predict(x_train)
 testPredict = model.predict(x_test)
 
-plt.plot(df['YYYYMMDD'],df['FHX'], label='actual data')
-#range(0,y_train.shape[0])
-plt.plot(df['YYYYMMDD'][:y_train.shape[0]],ynorm.inverse_transform(trainPredict), label='training prediction',alpha=0.6)
-#range(y_train.shape[0],y_train.shape[0]+y_test.shape[0])
-plt.plot(df['YYYYMMDD'][y_train.shape[0]:y_train.shape[0]+y_test.shape[0]],ynorm.inverse_transform(testPredict), label='testing prediction',alpha=0.6)
-plt.xlabel('DateTime')
-plt.ylabel('Wind Speed')
-plt.title('Wind Speed Prediction')
-plt.legend()
-plt.show()
+def plotPrediction(actualDataframe, trainPredict, testPredict, ylabelname, title):
+    plt.plot(df['YYYYMMDD'],actualDataframe, label='actual data')
+    plt.plot(df['YYYYMMDD'][:y_train.shape[0]],ynorm.inverse_transform(trainPredict), label='training prediction',alpha=0.6)
+    plt.plot(df['YYYYMMDD'][y_train.shape[0]:y_train.shape[0]+y_test.shape[0]],ynorm.inverse_transform(testPredict), label='testing prediction',alpha=0.6)
+    plt.xlabel('DateTime')
+    plt.ylabel(ylabelname)
+    plt.title(title)
+    plt.legend()
+    plt.show()
 
-listOfTraining = trainPredict.tolist()
-listOfTesting = testPredict.tolist()
-listOfActual = df['FHX'].tolist()
-joinedList = listOfTraining + listOfTesting
+plotPrediction(df['FHX'], trainPredict, testPredict, 'Wind Speed', 'Wind Speed Prediction')
 
-predictedList = []
-count = 0
-for date in df['YYYYMMDD']:
-    predictedList.append(int(float(ynorm.inverse_transform(joinedList[count]))))
-    count = count + 1
+def dataframeToCSV(actualDataframe, filename):
+    #convert np arrays to list and add the training and testing results together in a list
+    listOfTraining = trainPredict.tolist()
+    listOfTesting = testPredict.tolist()
+    listOfActual = actualDataframe.tolist()
+    joinedList = listOfTraining + listOfTesting
 
-# assign data of lists
-newDataframe = {'Date': df['YYYYMMDD'].tolist(), 'Predicted': predictedList, 'Actual': listOfActual}
+    #convert array(list[]) to integer
+    predictedList = []
+    count = 0
+    for date in df['YYYYMMDD']:
+        predictedList.append(int(float(ynorm.inverse_transform(joinedList[count]))))
+        count = count + 1
 
-# Create DataFrame  
-OutputDataframe = pd.DataFrame(newDataframe)
-OutputDataframe.to_csv('WeatherPredictionOutput.csv', index=False)
+    #assign list to column
+    newDataframe = {'Date': df['YYYYMMDD'].tolist(), 'Predicted': predictedList, 'Actual': listOfActual}
+
+    #create dataframe
+    OutputDataframe = pd.DataFrame(newDataframe)
+
+    #convert dataframe to csv
+    OutputDataframe.to_csv(filename, index=False)
+
+dataframeToCSV(df['FHX'], 'WeatherPredictionOutput.csv')
 
 def showPredictionYear(filename, year):
     new_df = pd.read_csv(filename, skipinitialspace=True)
@@ -112,17 +120,15 @@ def showPredictionYear(filename, year):
 
 showPredictionYear('WeatherPredictionOutput.csv', 2021)
 
-
-    
-
 #Estimate model performance
-trainingScore = model.evaluate(x_train, y_train, verbose=0)
-print('Training Score is : %.2f MSE (%.2f RMSE)' % (trainingScore, math.sqrt(trainingScore)))
-print('r2 score for training: ', r2_score(y_train, trainPredict))
-print('')
-testingScore = model.evaluate(x_test, y_test, verbose=0)
-print('Testing Score is  : %.2f MSE (%.2f RMSE)' % (testingScore, math.sqrt(testingScore)))
-print('r2 score for testing: ', r2_score(y_test, testPredict))
+def evaluationResults(x, y, predict):
+    score = model.evaluate(x, y, verbose=0)
+    print('Training Score is : %.2f MSE (%.2f RMSE)' % (score, math.sqrt(score)))
+    print('r2 score for training: ', r2_score(y, predict))
+    print('')
+
+evaluationResults(x_train, y_train, trainPredict)
+evaluationResults(x_test, y_test, testPredict)
 
 #get max error rate
 count = 0
@@ -131,7 +137,6 @@ for y in testPredict:
     if((ynorm.inverse_transform(testPredict)[count] - ynorm.inverse_transform(y_test)[count])/ynorm.inverse_transform(y_test)[count] * 100 > maxerrorrate):
         maxerrorrate = (ynorm.inverse_transform(testPredict)[count] - ynorm.inverse_transform(y_test)[count])/ynorm.inverse_transform(y_test)[count] * 100
     count = count + 1
-print('')
 print('Highest error rate: ', maxerrorrate)
 
 #new instances where we do not know the answer

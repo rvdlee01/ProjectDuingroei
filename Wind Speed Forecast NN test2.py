@@ -7,8 +7,6 @@ import calendar
 from keras.models import Sequential
 from keras.models import Model
 from keras.layers import Dense
-from keras.layers import LSTM
-from keras.layers import Dropout
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score
@@ -38,14 +36,13 @@ def readCSV(filename):
     df = pd.read_csv(filename, skipinitialspace=True)
     return df
 
-df = createCSV('weather.csv')
+#df = createCSV('weather.csv') # Uncomment if you do not have the wind data csv file
 df = readCSV('WindData.csv')
 x = df[['TG', 'TN', 'TX','PG','UG', 'FHN', 'FG', 'DDVEC', 'RH']]
 y = df[['FHX']]
-
+df['YYYYMMDD'] = pd.to_datetime(df['YYYYMMDD'])
 #90% training data & 10% testing data
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.1, random_state=0, shuffle=False)
-#x_train, x_test, y_train, y_test = x[1:8343], x[8343:],y[1:8343], y[8343:]
 
 #Standardize data
 xnorm = StandardScaler()
@@ -74,9 +71,11 @@ model.fit(x_train,y_train, epochs=300, batch_size=6000, verbose=0, shuffle=False
 trainPredict = model.predict(x_train)
 testPredict = model.predict(x_test)
 
-plt.plot(df['FHX'], label='actual data')
-plt.plot(range(0,y_train.shape[0]),ynorm.inverse_transform(trainPredict), label='training prediction',alpha=0.6)
-plt.plot(range(y_train.shape[0],y_train.shape[0]+y_test.shape[0]),ynorm.inverse_transform(testPredict), label='testing prediction',alpha=0.6)
+plt.plot(df['YYYYMMDD'],df['FHX'], label='actual data')
+#range(0,y_train.shape[0])
+plt.plot(df['YYYYMMDD'][:y_train.shape[0]],ynorm.inverse_transform(trainPredict), label='training prediction',alpha=0.6)
+#range(y_train.shape[0],y_train.shape[0]+y_test.shape[0])
+plt.plot(df['YYYYMMDD'][y_train.shape[0]:y_train.shape[0]+y_test.shape[0]],ynorm.inverse_transform(testPredict), label='testing prediction',alpha=0.6)
 plt.xlabel('DateTime')
 plt.ylabel('Wind Speed')
 plt.title('Wind Speed Prediction')

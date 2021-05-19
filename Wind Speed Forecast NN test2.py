@@ -82,6 +82,24 @@ plt.title('Wind Speed Prediction')
 plt.legend()
 plt.show()
 
+listOfTraining = trainPredict.tolist()
+listOfTesting = testPredict.tolist()
+listOfActual = df['FHX'].tolist()
+joinedList = listOfTraining + listOfTesting
+
+predictedList = []
+count = 0
+for date in df['YYYYMMDD']:
+    predictedList.append(int(float(ynorm.inverse_transform(joinedList[count]))))
+    count = count + 1
+
+# assign data of lists
+newDataframe = {'Date': df['YYYYMMDD'].tolist(), 'Predicted': predictedList, 'Actual': listOfActual}
+
+# Create DataFrame  
+OutputDataframe = pd.DataFrame(newDataframe)
+OutputDataframe.to_csv('WeatherPredictionOutput.csv', index=False)
+
 #Estimate model performance
 trainingScore = model.evaluate(x_train, y_train, verbose=0)
 print('Training Score is : %.2f MSE (%.2f RMSE)' % (trainingScore, math.sqrt(trainingScore)))

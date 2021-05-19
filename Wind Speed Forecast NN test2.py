@@ -100,6 +100,21 @@ newDataframe = {'Date': df['YYYYMMDD'].tolist(), 'Predicted': predictedList, 'Ac
 OutputDataframe = pd.DataFrame(newDataframe)
 OutputDataframe.to_csv('WeatherPredictionOutput.csv', index=False)
 
+def showPredictionYear(filename, year):
+    new_df = pd.read_csv(filename, skipinitialspace=True)
+    new_df['Date'] = pd.to_datetime(new_df['Date'])
+    
+    new_df = new_df[new_df['Date'].dt.year == year]
+    
+    plt.plot(new_df['Date'],new_df['Actual'],label='actual')
+    plt.plot(new_df['Date'],new_df['Predicted'],label='predicted')
+    plt.show()
+
+showPredictionYear('WeatherPredictionOutput.csv', 2021)
+
+
+    
+
 #Estimate model performance
 trainingScore = model.evaluate(x_train, y_train, verbose=0)
 print('Training Score is : %.2f MSE (%.2f RMSE)' % (trainingScore, math.sqrt(trainingScore)))

@@ -1,15 +1,25 @@
+from tkinter.constants import DISABLED
 import matplotlib
 matplotlib.use("TkAgg")
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from matplotlib.figure import Figure
 
-
+from tkinter import *
 import tkinter as tk
 from tkinter import ttk
 
+from tkinter import font
 
 LARGE_FONT = ("Verdana", 12)
+filename =''
+def getCsvFile(self):
+    global filename
+    filename = filedialog.askopenfilename()
+    if filename != '':
+        self.button1["state"] = tk.NORMAL
+        self.button2.configure(bg="green")
+    
 
 class DuinGroeiApp(tk.Tk):
     def __init__(self, *args, **kwargs):
@@ -37,14 +47,19 @@ class DuinGroeiApp(tk.Tk):
         frame.tkraise()
 
 class StartPage(tk.Frame):
+    global button1
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
+        myFont = font.Font(family = 'Helvetica', size = 30)
         label = tk.Label(self, text="Start Page", font=LARGE_FONT)
         label.pack(pady=10,padx=10)
 
-        button1 = ttk.Button(self, text="Go to graph page",
-                            command=lambda: controller.show_frame(PageOne))
-        button1.pack()
+        self.button1 = tk.Button(self,state = DISABLED, text="Go to graph page",
+                            command=lambda: controller.show_frame(PageOne), font = myFont)
+        self.button2 = tk.Button(self, text="Select csv file",
+                            command=lambda: getCsvFile(self), font = myFont)
+        self.button1.pack(padx=50,pady=50)
+        self.button2.pack()
 
 class PageOne(tk.Frame):
     def __init__(self, parent, controller):

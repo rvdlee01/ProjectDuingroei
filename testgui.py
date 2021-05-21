@@ -27,6 +27,7 @@ class DuinGroeiApp(tk.Tk):
 
         tk.Tk.iconbitmap(self, default="dune_icon.ico")
         tk.Tk.wm_title(self, "DuinHoogte")
+        tk.Tk.wm_geometry(self, "1600x900")
 
         container = tk.Frame(self)
         container.pack(side="top", fill="both", expand=True)

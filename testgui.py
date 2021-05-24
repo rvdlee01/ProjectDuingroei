@@ -18,15 +18,18 @@ filename =''
 
 
 def load_Data(self,csv_data):
-    df = pd.read_csv(csv_data)
-    self.tv1["column"] = list(df.columns)
-    self.tv1["show"] = "headings"
-    for column in self.tv1["columns"]:
-        self.tv1.heading(column, text=column)
-    
-    df_rows = df.to_numpy().tolist()
-    for row in df_rows:
-        self.tv1.insert("", "end", values=row)
+    try:
+        df = pd.read_csv(csv_data)
+        self.tv1["column"] = list(df.columns)
+        self.tv1["show"] = "headings"
+        for column in self.tv1["columns"]:
+            self.tv1.heading(column, text=column)
+        
+        df_rows = df.to_numpy().tolist()
+        for row in df_rows:
+            self.tv1.insert("", "end", values=row)
+    except:
+        tk.messagebox.showerror("Error", "Wrong file or file format!")
     return None
 
 

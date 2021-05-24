@@ -33,7 +33,7 @@ def load_Data(self,csv_data):
 
 def getCsvFile(self):
     global filename
-    filename = filedialog.askopenfilename()
+    filename = filedialog.askopenfilename(initialdir = "/",title = "Select file",filetypes = (("Csv files", "*.csv"),("xlsx files","*.xlsx")))
     if filename != '':
         self.button1["state"] = tk.NORMAL
         self.button2.configure(bg="green")

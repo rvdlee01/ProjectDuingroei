@@ -1,6 +1,7 @@
 from tkinter.constants import DISABLED
 import matplotlib
 matplotlib.use("TkAgg")
+import pandas as pd
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from matplotlib.figure import Figure
@@ -14,12 +15,31 @@ from tkinter import font
 
 LARGE_FONT = ("Verdana", 12)
 filename =''
+
+
+def load_Data(self,csv_data):
+    df = pd.read_csv(csv_data)
+    self.tv1["column"] = list(df.columns)
+    self.tv1["show"] = "headings"
+    for column in self.tv1["columns"]:
+        self.tv1.heading(column, text=column)
+    
+    df_rows = df.to_numpy().tolist()
+    for row in df_rows:
+        self.tv1.insert("", "end", values=row)
+    return None
+
+
+
 def getCsvFile(self):
     global filename
     filename = filedialog.askopenfilename()
     if filename != '':
         self.button1["state"] = tk.NORMAL
         self.button2.configure(bg="green")
+        self.tv1.delete(*self.tv1.get_children())
+        load_Data(self,filename)
+        
     
 
 class DuinGroeiApp(tk.Tk):
@@ -62,6 +82,21 @@ class StartPage(tk.Frame):
                             command=lambda: getCsvFile(self), font = myFont)
         self.button1.pack(padx=50,pady=50)
         self.button2.pack()
+        
+        # Frame for Treeview
+        csvTable = tk.LabelFrame(text ="CSV data")
+        csvTable.place(height=450,width=800,x = 400, y = 350)
+
+        ## Treeview Widget
+        self.tv1 = ttk.Treeview(csvTable)
+        self.tv1.place(relheight=1, relwidth=1)
+
+        treescrolly = tk.Scrollbar(csvTable, orient= "vertical", command = self.tv1.yview)
+        treescrollx = tk.Scrollbar(csvTable, orient= "horizontal", command = self.tv1.xview)
+        self.tv1.configure(xscrollcommand=treescrollx.set, yscrollcommand=treescrolly.set)
+        treescrollx.pack(side="bottom", fill="x")
+        treescrolly.pack(side="right", fill="y")
+
 
 class PageOne(tk.Frame):
     def __init__(self, parent, controller):

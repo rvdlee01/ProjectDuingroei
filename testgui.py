@@ -40,7 +40,7 @@ def getCsvFile(self):
     if filename != '':
         self.button1["state"] = tk.NORMAL
         self.button2.configure(bg="green")
-        self.tv1.delete(*self.tv1.get_children())
+        self.tv1.delete(*self.tv1.get_children()) #Empties rows and columns in csvTable
         load_Data(self,filename)
         
     

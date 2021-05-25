@@ -71,44 +71,52 @@ class DuinGroeiApp(tk.Tk):
         frame = self.frames[cont]
         frame.tkraise()
 
+    def get_page(self, page_class): # returns reference to a page
+        return self.frames[page_class]
+
 class StartPage(tk.Frame):
     global button1
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
+        self.controller = controller
         myFont = font.Font(family = 'Helvetica', size = 30)
         label = tk.Label(self, text="Start Page", font=LARGE_FONT)
         label.pack(pady=10,padx=10)
 
         self.button1 = tk.Button(self,state = DISABLED, text="Go to graph page",
-                            command=lambda: controller.show_frame(PageOne), font = myFont)
+                            command=lambda: [controller.show_frame(PageOne),self.csvTable.place_forget()], font = myFont)
         self.button2 = tk.Button(self, text="Select csv file",
                             command=lambda: getCsvFile(self), font = myFont)
         self.button1.pack(padx=50,pady=50)
         self.button2.pack()
         
         # Frame for Treeview
-        csvTable = tk.LabelFrame(text ="CSV data")
-        csvTable.place(height=450,width=800,x = 400, y = 350)
+        self.csvTable = tk.LabelFrame(text ="CSV data")
+        self.csvTable.place(height=450,width=800,x = 400, y = 350)
+
 
         ## Treeview Widget
-        self.tv1 = ttk.Treeview(csvTable)
+        self.tv1 = ttk.Treeview(self.csvTable)
         self.tv1.place(relheight=1, relwidth=1)
 
-        treescrolly = tk.Scrollbar(csvTable, orient= "vertical", command = self.tv1.yview)
-        treescrollx = tk.Scrollbar(csvTable, orient= "horizontal", command = self.tv1.xview)
+        treescrolly = tk.Scrollbar(self.csvTable, orient= "vertical", command = self.tv1.yview)
+        treescrollx = tk.Scrollbar(self.csvTable, orient= "horizontal", command = self.tv1.xview)
         self.tv1.configure(xscrollcommand=treescrollx.set, yscrollcommand=treescrolly.set)
         treescrollx.pack(side="bottom", fill="x")
         treescrolly.pack(side="right", fill="y")
+
+        # self.csvTable.destroy()
 
 
 class PageOne(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
+        self.controller = controller
+        start_page = self.controller.get_page(StartPage) # Access variables from another class
         label = tk.Label(self, text="Graph page", font=LARGE_FONT)
         label.pack(pady=10,padx=10)
-
         button1 = ttk.Button(self, text="Home",
-                            command=lambda: controller.show_frame(StartPage))
+                            command=lambda: [controller.show_frame(StartPage), start_page.csvTable.place(height=450,width=800,x = 400, y = 350)])
         button1.pack()
 
         f = Figure(figsize=(5,5), dpi=100)

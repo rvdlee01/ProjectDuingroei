@@ -13,27 +13,28 @@ from sklearn.metrics import r2_score
 # create future forecast dates
 def create_dates(start,days):
     v = pd.date_range(start=start, periods=days+1, freq='D', closed='right')
-    one_year_forecast = pd.DataFrame(index=v) 
-    return one_year_forecast
+    list_of_dates = pd.DataFrame(index=v)
+    return list_of_dates
 
 # train-test split for a user input ratio
-def train_test_split(value, name, ratio):
-    nrow = len(value)
-    print(name+' total samples: ',nrow)
+def train_test_split(df, column_name, ratio):
+    nrow = len(df)
+    print(column_name+' total samples: ',nrow)
     split_row = int((nrow)*ratio)
     print('Training samples: ',split_row)
     print('Testing samples: ',nrow-split_row)
-    train = value.iloc[:split_row]
-    test = value.iloc[split_row:]
+    # Split rows
+    train = df.iloc[:split_row]
+    test = df.iloc[split_row:]
     return train, test, split_row     
 
 # data transformation
 def data_transformation(x_train,x_test):
-    scaler = MinMaxScaler()
+    scaler = StandardScaler()
     x_train_scaled = scaler.fit_transform(x_train)
     x_test_scaled = scaler.fit_transform(x_test)
 
-    # Create new dataframe for scaled data
+    # Creates new dataframes for scaled data
     x_train_scaled_df = pd.DataFrame(x_train_scaled, index = x_train.index, columns=[x_train.columns[0]])
     x_test_scaled_df = pd.DataFrame(x_test_scaled, index = x_test.index, columns=[x_test.columns[0]])
 
@@ -57,16 +58,16 @@ def make_arrays(x_train,x_test):
 # Define LSTM model
 def lstm_model(units, trainX, testX, y_train_array, y_test_array):
     model = Sequential()
-    model.add(LSTM(units,return_sequences=True, input_shape=(trainX.shape[1],trainX.shape[2]),kernel_initializer='lecun_uniform'))
+    model.add(LSTM(units,return_sequences=True, input_shape=(trainX.shape[1],trainX.shape[2])))
     model.add(Dropout(0.2))    
     model.add(LSTM(units, return_sequences=True))
-    model.add(Dropout(0.2))    
+    model.add(Dropout(0.2))   
     model.add(LSTM(units))
     model.add(Dropout(0.2))
     model.add(Dense(1))        
     model.compile(optimizer='adam', loss='mean_squared_error')
-    
-    model.fit(trainX, y_train_array, batch_size=120, epochs=100, validation_data=(testX, y_test_array), verbose=0)
+    #300, 150
+    model.fit(trainX, y_train_array, batch_size=300, epochs=150, validation_data=(testX, y_test_array), verbose=0)
     return model
 
 # validation result 
@@ -106,34 +107,34 @@ def windspeed_lstm(all_windspeed, lag, days):
 
     # Create list of dates
     one_year_forecast_lstm = create_dates('2021-05-17',days)
-    
-    # Preprocessing
-    windspeed_df = all_windspeed
-    column_name = all_windspeed.columns[0] # Column name is FHX
 
-    # Split data into 90% training data and 10% test data
-    x_train, x_test, split_row = train_test_split(windspeed_df, column_name, 0.90)
+    windspeed_df = all_windspeed
+    column_name = 'FHX'
+
+    # Split data into 80% training data and 20% test data
+    x_train, x_test, split_row = train_test_split(windspeed_df, column_name, 0.80)
 
     # Scale data
     x_train_scaled_df, x_test_scaled_df, scaler = data_transformation(x_train,x_test)
 
-    #???????????????????
     x_train = timeseries_feature_builder(x_train_scaled_df, lag+1) 
     x_test = timeseries_feature_builder(x_test_scaled_df, lag+1)
+    print(x_train)
 
     # Create arrays
     x_train_arr, y_train_arr, x_test_arr, y_test_arr = make_arrays(x_train,x_test)
-        
-    trainX = np.reshape(x_train_arr, (x_train_arr.shape[0],1,x_train_arr.shape[1]))
-    testX = np.reshape(x_test_arr, (x_test_arr.shape[0],1,x_test_arr.shape[1]))                
-        
+
+    trainX = np.reshape(x_train_arr, (x_train_arr.shape[0],1,x_train_arr.shape[1])) 
+    testX = np.reshape(x_test_arr, (x_test_arr.shape[0],1,x_test_arr.shape[1]))
+
     # LSTM modelling & forecast
     model = lstm_model(30, trainX, testX, y_train_arr, y_test_arr)
-    
-    x_test_pred = valid_result(model, testX, y_test_arr, scaler, windspeed_df, split_row, lag)        
-    one_year = forecast(model, testX, x_test, lag, scaler, days)       
-    one_year_forecast_lstm[column_name] = np.array(one_year)       
-        
+
+    x_test_pred = valid_result(model, testX, y_test_arr, scaler, windspeed_df, split_row, lag)
+    one_year = forecast(model, testX, x_test, lag, scaler, days)
+    one_year_forecast_lstm[column_name] = np.array(one_year)
+
+    print(one_year_forecast_lstm[column_name])
     # Plot result
     plt.plot(x_test_pred)        
     plt.plot(one_year_forecast_lstm[column_name], color='red', label='forecast')         
@@ -147,23 +148,31 @@ def readCSV(filename):
     df = pd.read_csv(filename, skipinitialspace=True)
     return df
 
+def createCSV(filename):
+    myCSV = pd.read_csv(filename, skipinitialspace=True)  
+    df = myCSV[['YYYYMMDD','FHX']]
+    
+    df = df.fillna(0)
+    df = df.astype(int)
+    df['YYYYMMDD'] = pd.to_datetime(df['YYYYMMDD'], format='%Y%m%d')
+    df = df[df['YYYYMMDD'].dt.year > 1995]
+    df.to_csv('ActualData.csv', index=False)
+
+#newCSV = createCSV('etmgeg_330.csv')
+
 df = readCSV('WindData.csv')
 x = df[['YYYYMMDD','FHX']]
 
-new_df = x.copy() 
-new_df[new_df.columns[0]] = pd.to_datetime(new_df[new_df.columns[0]])
-
+new_df = x.copy()
+new_df['YYYYMMDD'] = pd.to_datetime(new_df['YYYYMMDD'])
 # set date column as index of the dataset
-new_df = new_df.set_index(new_df.columns[0])
+new_df = new_df.set_index('YYYYMMDD')
 new_df = new_df.sort_index()
 all_windspeed = new_df
 print(all_windspeed.tail())
 
 # Fitting and forecast using LSTM  -- output of train loss and valid loss is turned off
 lstm_prediction = windspeed_lstm(all_windspeed,730,365)
-
-
-
 
 
 

@@ -23,7 +23,21 @@ def SelectFile():
     # print(data)
 selected_file = SelectFile()
 f = open(selected_file)
-data = f.read()
+
+df = pd.read_csv(selected_file)
+# print(df)
+Jaar = input("Kolom naam jaar: ")
+Windkracht7 = input("Windkracht7: ")
+Windkracht8 = input("Windkracht8: ")
+Windkracht9 = input("Windkracht9: ")
+Windkracht10 = input("Windkracht10: ")
+Windkracht11 = input("Windkracht11: ")
+Neerslag = input("Neerslag: ")
+
+X = df[[Jaar, Windkracht7, Windkracht8, Windkracht9 , Windkracht10, Windkracht11, Neerslag ]]
+print(X)
+
+# data = f.read()
 # print(data)
 # outfile = open("Weerdata.csv", 'w')
 # with open(selected_file, 'r') as csv_file:
@@ -38,8 +52,8 @@ data = f.read()
 # outfile.close()
 
 
-def createCSV(filename):
-    myCSV = pd.read_csv(filename)
+# def createCSV(filename):
+#     myCSV = pd.read_csv(filename)
 
 # row_year = input("enter which row is Year: ")
 # with open('WeatherData.csv', 'w') as new_file:

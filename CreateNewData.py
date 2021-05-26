@@ -14,7 +14,8 @@ def createCSV(filename):
     df = df.fillna(0)
     df = df.astype(int)
     df['YYYYMMDD'] = pd.to_datetime(df['YYYYMMDD'], format='%Y%m%d')
-    df = df[df['YYYYMMDD'].dt.year > 1995]
+    df = df[df['YYYYMMDD'].dt.year > 1996]
+    df = df[df['YYYYMMDD'].dt.year <= 2020]
     df.to_csv('newdata.csv', index=False)
 
 def readCSV(filename):
@@ -61,6 +62,19 @@ def addWinddirection(degree,north,east,south,west,northeast,southeast,southwest,
         northwest += 1
     return north,east,south,west,northeast,southeast,southwest,northwest
 
+punt1 = [928, 964, 913, -1, 904, -1, 944, 930, 1007, 992, 1006, 969, 936, 873, 947, 1003, 953, 930, 901, 877,
+         855, 849, 851, 841]
+
+punt2 = [791, 826, 818, -1, 806, -1, 850, 836, 861, 858, 887, 961, 831, 827, 946, 949, 917, 888, 850, 830, 822,
+         808, 803, 800]
+
+punt3 = [814, 848, 831, -1, 807, -1, 877, 867, 891, 920, 922, 995, 897, 849, 1067, 1065, 1060, 1034, 1013, 985,
+         978, 951, 937, 924]
+
+neerslag = [656.5, 1206.7, 1020.6, 971.4, 1154.7, 974.5, 637.5, 840.8, 794.7, 883.5, 892.6, 869.8, 746.2, 850.8,
+            897.9, 994, 886.4, 804.4, 891.3, 865.8, 956.3, 700.9, 929.3, 985.3]
+
+count = 0
 for y in yearList:
     # Retrieves data from specific year
     yeardata = df[df['YYYYMMDD'].dt.year == y]
@@ -90,10 +104,11 @@ for y in yearList:
             aveghumidity += 1
         else:
             highhumidity += 1
-    data = [y,wp6,wp7,wp8,wp9,wp10,wp11,wp12,north,east,south,west,northeast,southeast,southwest,northwest,highhumidity, lowhumidity, aveghumidity]
+    data = [y,punt1[count],punt2[count],punt3[count],wp6,wp7,wp8,wp9,wp10,wp11,wp12,north,east,south,west,northeast,southeast,southwest,northwest,highhumidity, lowhumidity, aveghumidity,neerslag[count]]
     print(data)
     dataList.append(data)
-newdf = pd.DataFrame(dataList, columns = ['year', 'windkracht6','windkracht7','windkracht8','windkracht9','windkracht10','windkracht11','windkracht12',
-                                          'north','east','south','west','northeast','southeast','southwest','northwest','highhumidity', 'lowhumidity', 'aveghumidity'])
+    count += 1
+newdf = pd.DataFrame(dataList, columns = ['year','punt1','punt2','punt3','windkracht6','windkracht7','windkracht8','windkracht9','windkracht10','windkracht11','windkracht12',
+                                          'north','east','south','west','northeast','southeast','southwest','northwest','highhumidity', 'lowhumidity', 'aveghumidity','neerslag'])
 newdf.to_csv('newdataColumns.csv', index=False)
 

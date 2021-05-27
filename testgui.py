@@ -6,6 +6,7 @@ from matplotlib.figure import Figure
 
 
 import tkinter as tk
+from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog
 
@@ -47,13 +48,13 @@ class DuinGroeiApp(tk.Tk):
 class StartPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        
+          
         label = tk.Label(self, text="Start Page", font=LARGE_FONT)
         label.pack(pady=10,padx=10)
-
-        button1 = ttk.Button(self, text="Go to graph page",
+         
+        button1 = ttk.Button(self, text="Go to graph page", 
                             command=lambda: controller.show_frame(PageOne))
-        button2 = ttk.Button(self, text="Select csv file",
+        button2 = Button(self, text="Select csv file", 
                             command=lambda: getCsvFile())
         button1.pack()
         button2.pack()

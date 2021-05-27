@@ -43,12 +43,7 @@ def getCsvFile(self):
         self.tv1.delete(*self.tv1.get_children()) #Empties rows and columns in csvTable
         load_Data(self,filename)
         
-    
 
-def getCsvFile():
-    global filename
-    filename = filedialog.askopenfilename()
-    
 
 class DuinGroeiApp(tk.Tk):
     def __init__(self, *args, **kwargs):

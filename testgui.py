@@ -7,9 +7,15 @@ from matplotlib.figure import Figure
 
 import tkinter as tk
 from tkinter import ttk
+from tkinter import filedialog
 
 
 LARGE_FONT = ("Verdana", 12)
+
+def getCsvFile():
+    global filename
+    filename = filedialog.askopenfilename()
+    
 
 class DuinGroeiApp(tk.Tk):
     def __init__(self, *args, **kwargs):
@@ -17,6 +23,8 @@ class DuinGroeiApp(tk.Tk):
 
         tk.Tk.iconbitmap(self, default="dune_icon.ico")
         tk.Tk.wm_title(self, "DuinHoogte")
+        tk.Tk.wm_geometry(self, "1600x900")
+        
 
         container = tk.Frame(self)
         container.pack(side="top", fill="both", expand=True)
@@ -39,12 +47,16 @@ class DuinGroeiApp(tk.Tk):
 class StartPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
+        
         label = tk.Label(self, text="Start Page", font=LARGE_FONT)
         label.pack(pady=10,padx=10)
 
         button1 = ttk.Button(self, text="Go to graph page",
                             command=lambda: controller.show_frame(PageOne))
+        button2 = ttk.Button(self, text="Select csv file",
+                            command=lambda: getCsvFile())
         button1.pack()
+        button2.pack()
 
 class PageOne(tk.Frame):
     def __init__(self, parent, controller):
@@ -64,7 +76,9 @@ class PageOne(tk.Frame):
         canvas.draw()
         canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand= True)
 
-        
+        toolbar = NavigationToolbar2Tk(canvas, self)
+        toolbar.update()
+        canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
 app = DuinGroeiApp()
 app.mainloop()

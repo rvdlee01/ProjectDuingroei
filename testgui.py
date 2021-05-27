@@ -54,7 +54,11 @@ class StartPage(tk.Frame):
          
         button1 = ttk.Button(self, text="Go to graph page", 
                             command=lambda: controller.show_frame(PageOne))
+<<<<<<< Updated upstream
         button2 = Button(self, text="Select csv file", 
+=======
+        button2 = ttk.Button(self, text="Select csv file", 
+>>>>>>> Stashed changes
                             command=lambda: getCsvFile())
         button1.pack()
         button2.pack()

@@ -2,6 +2,8 @@ from tkinter import *
 from tkinter import filedialog
 import csv
 import pandas as pd
+from io import StringIO
+import numpy as np
 
 # root = Tk()
 
@@ -12,62 +14,48 @@ def SelectFile():
     file_path = filedialog.askopenfilename(
         title="select a file", filetype=[("CSV files", '.csv')])
     return file_path
-    # print(file_path)
-    # file_path = 0
 
-    # uitlezen van een file
-    # f = open(file_path)
-    # f = open("D:/Informatica/Informatica jaar 2/Periode 4/Project/test.csv", "r")
-    # data = f.read()
-    # print(f)
-    # print(data)
+def CheckData(checklist, csv_columns):
+    if(checklist == csv_columns):
+        print("Correct in functie")
+    else:
+        print("fout in functie")
+
+def CheckRows(selected_file):
+    num_rows = -1
+    for row in open(selected_file):
+        num_rows += 1
+    if(num_rows > 5):
+        print("Correct aantal rows")
+    else:
+        print("Te weinig rows")
+#file selecteren van windows explorer
 selected_file = SelectFile()
-f = open(selected_file)
-
+# uitlezen van csv file
 df = pd.read_csv(selected_file)
+# missende data aanvullen met 0
+df = df.fillna(0)
+df = df.astype(int)
+# lijst maken van kolom namen door .columns 
+list_of_column_names = list(df.columns)
+check_list = ['jaar','duinhoogte','stormdagen','windkracht7','windkracht8','windkracht9','windkracht10','windkracht11','neerslag']
+# elk woord in de lijst zetten naar HOOFDLETTERS
+check_list = [each_string.upper() for each_string in check_list]
+list_of_column_names = [each_string.upper() for each_string in list_of_column_names]
+#functie aanroepen
+CheckData(check_list, list_of_column_names)
+CheckRows(selected_file) 
+
+print(df.head())
+
+
+
+# if(check_list == list_of_column_names):
+#     print("correct buiten functie")
 # print(df)
-Jaar = input("Kolom naam jaar: ")
-Windkracht7 = input("Windkracht7: ")
-Windkracht8 = input("Windkracht8: ")
-Windkracht9 = input("Windkracht9: ")
-Windkracht10 = input("Windkracht10: ")
-Windkracht11 = input("Windkracht11: ")
-Neerslag = input("Neerslag: ")
-
-X = df[[Jaar, Windkracht7, Windkracht8, Windkracht9 , Windkracht10, Windkracht11, Neerslag ]]
-print(X)
-
-# data = f.read()
-# print(data)
-# outfile = open("Weerdata.csv", 'w')
-# with open(selected_file, 'r') as csv_file:
-#     csv_reader = csv.reader(csv_file)
-#     header = next(csv_reader)
-#     for row in csv_reader:
-#         jaar = row[0]
-#         hoogte = row[1]
-#         stormdagen = row[2]
-#         line = "{},{},{}\n".format(jaar, hoogte, stormdagen)
-#         outfile.write(line)
-# outfile.close()
+# f = open(selected_file)
 
 
-# def createCSV(filename):
-#     myCSV = pd.read_csv(filename)
-
-# row_year = input("enter which row is Year: ")
-# with open('WeatherData.csv', 'w') as new_file:
-
-# csv_writer = csv.writer(new_file)
-
-# row_duinhoogte = input("enter which row is Year: ")
-# row_stromdagen = input("enter which row is Year: ")
-# row_windkracht7 = input("enter which row is Year: ")
-# row_windkracht8 = input("enter which row is Year: ")
-# row_windkracht9 = input("enter which row is Year: ")
-# row_windkracht10 = input("enter which row is Year: ")
-# row_windkracht11 = input("enter which row is Year: ")
-# row_neerslag = input("enter which row is neerslag: ")
-# for row in csv_reader:
-#     year = row[row_year]
-#     duinhoogte = row[duinhoogte]
+# df_cols = pd.read_csv(selected_file, nrows=0)
+# print("df")
+# print(df_cols)

@@ -15,17 +15,17 @@ def SelectFile():
         title="select a file", filetype=[("CSV files", '.csv')])
     return file_path
 
-def CheckData(checklist, csv_columns):
-    if(checklist == csv_columns):
-        print("Correct in functie")
-    else:
-        print("fout in functie")
+def CheckColumnNames(checklist, csv_columns):
+    for element in checklist:
+        if element not in csv_columns:
+            return False
+    return True
 
 def CheckRows(selected_file):
     num_rows = -1
     for row in open(selected_file):
         num_rows += 1
-    if(num_rows > 5):
+    if(num_rows > 10):
         print("Correct aantal rows")
     else:
         print("Te weinig rows")
@@ -33,18 +33,23 @@ def CheckRows(selected_file):
 selected_file = SelectFile()
 # uitlezen van csv file
 df = pd.read_csv(selected_file)
-# missende data aanvullen met 0
-df = df.fillna(0)
-df = df.astype(int)
+# missende data aanvullen met nan
+df = df.fillna(np.nan)
+# df = df.astype(int)
 # lijst maken van kolom namen door .columns 
 list_of_column_names = list(df.columns)
 check_list = ['jaar','duinhoogte','stormdagen','windkracht7','windkracht8','windkracht9','windkracht10','windkracht11','neerslag']
 # elk woord in de lijst zetten naar HOOFDLETTERS
-check_list = [each_string.upper() for each_string in check_list]
-list_of_column_names = [each_string.upper() for each_string in list_of_column_names]
+check_list = [each_string.lower() for each_string in check_list]
+list_of_column_names = [each_string.lower() for each_string in list_of_column_names]
 #functie aanroepen
-CheckData(check_list, list_of_column_names)
+booleanCheck = CheckColumnNames(check_list, list_of_column_names)
+if(booleanCheck):
+    print("Kolommen kloppen")
+else:
+    print("Kolommen kloppen niet")
 CheckRows(selected_file) 
+
 
 print(df.head())
 

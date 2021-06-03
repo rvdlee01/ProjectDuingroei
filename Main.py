@@ -26,6 +26,22 @@ from sklearn.metrics import r2_score
 LARGE_FONT = ("Verdana", 12)
 filename =''
 
+def CheckColumnNames(checklist, csv_columns):
+    for element in checklist:
+        if element not in csv_columns:
+            return False
+    return True
+
+def CheckRows(selected_file):
+    num_rows = -1
+    for row in open(selected_file):
+        num_rows += 1
+    if(num_rows > 10):
+        print("Correct aantal rows")
+        return True
+    else:
+        print("Te weinig rows")
+        return False
 
 def load_Data(self,csv_data):
     try:
@@ -38,8 +54,22 @@ def load_Data(self,csv_data):
         df_rows = df.to_numpy().tolist()
         for row in df_rows:
             self.tv1.insert("", "end", values=row)
-        self.button1["state"] = tk.NORMAL
-        self.button2.configure(bg="green")
+
+        # missende data aanvullen met nan
+        df = df.fillna(np.nan)
+        # lijst maken van kolom namen door .columns 
+        list_of_column_names = list(df.columns)
+        check_list = ['year','punt1','punt2','punt3','windkracht6','windkracht7','windkracht8','windkracht9','windkracht10','windkracht11','windkracht12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','aveghumidity','neerslag']
+        # elk woord in de lijst zetten naar HOOFDLETTERS
+        list_of_column_names = [each_string.lower() for each_string in list_of_column_names]
+        #functie aanroepen
+        boolColumns = CheckColumnNames(check_list, list_of_column_names)
+        if(boolColumns):
+            print("Kolommen kloppen")
+        else:
+            print("Kolommen kloppen niet")
+        boolRows = CheckRows(csv_data)
+        return boolColumns, boolRows
     except:
         tk.messagebox.showerror("Error", "Wrong file or file format!")
     return None
@@ -51,7 +81,13 @@ def getCsvFile(self):
     filename = filedialog.askopenfilename(initialdir = "/",title = "Select file",filetypes = [("CSV files", '.csv')])
     if filename != '':
         self.tv1.delete(*self.tv1.get_children()) #Empties rows and columns in csvTable
-        load_Data(self,filename)
+        boolColumns, boolRows = load_Data(self,filename)
+        if ((boolColumns == False) or (boolRows == False)):
+            self.button1["state"] = tk.DISABLED
+            self.button2.configure(bg="red")
+        if ((boolColumns == True) and (boolRows == True)):
+            self.button1["state"] = tk.NORMAL
+            self.button2.configure(bg="green")
 
 #JASPER NIEUWE FUNCTIE VOOR NAMEN CHECK HIER :D
         
@@ -183,7 +219,7 @@ class StartPage(tk.Frame):
         self.button2 = tk.Button(self, text="CSV bestand selecteren", width=18,
                             command=lambda: getCsvFile(self), font = myFont)
         self.button2.pack(ipadx=5,ipady=3,padx=30,pady=25, side=LEFT)#anchor="ne"
-        self.button1.pack(ipadx=5,ipady=3,padx=30,pady=15, side=LEFT)#anchor="ne"
+        self.button1.pack(ipadx=5,ipady=3,padx=30,pady=15, side=LEFT)#side=LEFT
 
         listOfInputVariables = ['year','wp6','wp7','wp8','wp9','wp10','wp11','wp12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','avghumidity','precipitation']
         dictOfDirections = {'north':'noorden','east':'oosten','south':'zuiden','west':'westen','northeast':'noord-oosten','southeast':'zuid-oosten','southwest':'zuid-westen','northwest':'noord-westen'}
@@ -222,7 +258,7 @@ class StartPage(tk.Frame):
         
         # Frame for Treeview
         self.csvTable = tk.LabelFrame(text ="CSV data")
-        self.csvTable.pack(padx=30,pady=25,ipadx=400,ipady=250,anchor='nw')
+        self.csvTable.pack(padx=30,pady=25,ipadx=400,ipady=250,side=LEFT)#anchor='nw'
 
         # Treeview Widget
         self.tv1 = ttk.Treeview(self.csvTable)
@@ -306,7 +342,9 @@ class PageOne(tk.Frame):
             self.a.scatter(userOutputx,userOutputy,label="predicted user input")
 
             self.a.legend()
-            
+            self.f.set_figheight(10)
+            self.f.set_figwidth(20)
+            self.a.get_figure().savefig('duingroeivoorspelling.png')
             self.canvas.draw()
             self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 

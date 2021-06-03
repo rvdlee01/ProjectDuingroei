@@ -72,42 +72,39 @@ def model_NN(filename,inputX):
     listOfInput = inputPredict.tolist()
     joinedList = listOfTraining + listOfTesting
     joinedList2 = []
-    
-    def dataframeToCSV(y_train, y_test, filename):
-        y_train, y_test = convertToList(y_train, y_test)
-        for i in y_train + y_test:
-            joinedList2.append(i)
-        #convert array(list[]) to integer
-        predictedList = []
-        actualList = []
-        differences = []
-        errorrates = []
-        count = 0
-        for date in df['YYYYMMDD']:
-            predictedList.append(int(float(scaler.inverse_transform(joinedList[count]))))
-            actualList.append(int(float(scaler.inverse_transform(joinedList2[count]))))
-            differences.append(int(float(scaler.inverse_transform(joinedList[count]))) - int(float(scaler.inverse_transform(joinedList2[count]))))
-            errorrates.append((int(float(scaler.inverse_transform(joinedList[count]))) - int(float(scaler.inverse_transform(joinedList2[count]))))
-                              / int(float(scaler.inverse_transform(joinedList2[count]))) * 100)
-            count = count + 1
-        #add prediction of userinput to the lists
-        predictedList.append(int(float(scaler.inverse_transform(listOfInput[0]))))
-        actualList.append(None)
-        differences.append(None)
-        errorrates.append(None)
-        years.append(int(inputX['year'].values))
-        #assign list to column
-        newDataframe = {'Date': years, 'Predicted': predictedList, 'Actual': actualList, 'Difference': differences, 'Error rate': errorrates}
-        #create dataframe
-        OutputDataframe = pd.DataFrame(newDataframe)
-        #convert dataframe to csv
-        OutputDataframe.to_csv(filename, index=False)
-        print(OutputDataframe)
 
+    OutputDataframe = dataframeToCSV(y_train, y_test,joinedList2,joinedList,df,scaler,years,listOfInput,inputX)
+    return df, y_train,y_test, scaler.inverse_transform(y_train),scaler.inverse_transform(trainPredict), scaler.inverse_transform(y_test), scaler.inverse_transform(testPredict), scaler.inverse_transform(inputPredict), years,scaler.inverse_transform(joinedList), scaler.inverse_transform(joinedList2),OutputDataframe
 
-    dataframeToCSV(y_train, y_test, 'PredictedOutputs.csv')
-    return df, y_train,y_test, scaler.inverse_transform(y_train),scaler.inverse_transform(trainPredict), scaler.inverse_transform(y_test), scaler.inverse_transform(testPredict), scaler.inverse_transform(inputPredict), years,scaler.inverse_transform(joinedList), scaler.inverse_transform(joinedList2)
-
+def dataframeToCSV(y_train, y_test,joinedList2,joinedList,df,scaler,years,listOfInput,inputX):
+    y_train, y_test = convertToList(y_train, y_test)
+    for i in y_train + y_test:
+        joinedList2.append(i)
+    #convert array(list[]) to integer
+    predictedList = []
+    actualList = []
+    differences = []
+    errorrates = []
+    count = 0
+    for date in df['YYYYMMDD']:
+        predictedList.append(int(float(scaler.inverse_transform(joinedList[count]))))
+        actualList.append(int(float(scaler.inverse_transform(joinedList2[count]))))
+        differences.append(int(float(scaler.inverse_transform(joinedList[count]))) - int(float(scaler.inverse_transform(joinedList2[count]))))
+        errorrates.append((int(float(scaler.inverse_transform(joinedList[count]))) - int(float(scaler.inverse_transform(joinedList2[count]))))
+                            / int(float(scaler.inverse_transform(joinedList2[count]))) * 100)
+        count = count + 1
+    #add prediction of userinput to the lists
+    predictedList.append(int(float(scaler.inverse_transform(listOfInput[0]))))
+    actualList.append(None)
+    differences.append(None)
+    errorrates.append(None)
+    years.append(int(inputX['year'].values))
+    #assign list to column
+    newDataframe = {'Date': years, 'Predicted': predictedList, 'Actual': actualList, 'Difference': differences, 'Error rate': errorrates}
+    #create dataframe
+    OutputDataframe = pd.DataFrame(newDataframe)
+    print(OutputDataframe)
+    return OutputDataframe
 
 def convertToList(arrayX, arrayY):
     y, x = [],[]
@@ -144,7 +141,7 @@ class Mainscreen(ttk.Frame):
         my_canvas.create_window((0,0), window=second_frame, anchor="nw")
 
         predictbutton = Button(second_frame,state = DISABLED, text="Voorspellen", width=18,
-                            command=lambda: [my_canvas.pack_forget(), GraphPage(container, self),my_scrollbar.pack_forget()])
+                            command=lambda: [my_canvas.pack_forget(), GraphPage(container, self),my_scrollbar.pack_forget(),main_frame.pack_forget()])
         predictbutton.grid(row=0,column=1,padx=10,pady=10)
         uploadbutton = Button(second_frame, text="CSV bestand selecteren", width=18,
                             command=lambda: getCsvFile(uploadbutton, predictbutton, tv1))
@@ -271,7 +268,7 @@ def plotGraph(a,f,canvas,startpage,tv2,csvTable2):
                 start_page.south.get(),start_page.west.get(),start_page.northeast.get(),start_page.southeast.get(),start_page.southwest.get(),start_page.northwest.get(),start_page.highhumidity.get(),start_page.lowhumidity.get()
                 ,start_page.avghumidity.get(),start_page.precipitation.get()]
             
-    df,y_train,y_test,train_actual,train_predict,test_actual,test_predict,userOutput,years,listoftraining,listoftesting = model_NN(filename,inputX)
+    df,y_train,y_test,train_actual,train_predict,test_actual,test_predict,userOutput,years,listoftraining,listoftesting,OutputDataframe = model_NN(filename,inputX)
     print('prediction of userinput: ', userOutput)
     ax, ay = convertToList(years[:y_train.shape[0]], train_actual)
     bx, by = convertToList(years[:y_train.shape[0]], train_predict)
@@ -291,16 +288,12 @@ def plotGraph(a,f,canvas,startpage,tv2,csvTable2):
     a.scatter(userOutputx,userOutputy,label="predicted user input")
 
     a.legend()
-    f.set_figheight(10)
-    f.set_figwidth(20)
-    a.get_figure().savefig('duingroeivoorspelling.png')
     canvas.draw()
-    canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+    canvas.get_tk_widget().grid(sticky="n", column=2,row=1)
 
     for i in tv2.get_children():
         tv2.delete(i)
 
-    df = pd.read_csv('PredictedOutputs.csv')
     tv2["column"] = list(df.columns)
     tv2["show"] = "headings"
     for column in tv2["columns"]:
@@ -310,7 +303,9 @@ def plotGraph(a,f,canvas,startpage,tv2,csvTable2):
     for row in df_rows:
         tv2.insert("", "end", values=row)
 
-    csvTable2.grid(sticky='s',ipadx=400,ipady=250, pady=25)
+    csvTable2.grid(sticky='n',ipadx=400,ipady=250, pady=25,column=1,row=1)
+
+    return OutputDataframe
 
 class GraphPage(ttk.Frame):
     def __init__(self, container, start_page, *args, **kwargs):
@@ -338,10 +333,10 @@ class GraphPage(ttk.Frame):
 
         my_canvas.create_window((0,0), window=second_frame, anchor="nw")
 
-        homebutton = Button(second_frame,state = NORMAL, text="Terug naar startpagina", width=18,
-                            command=lambda: [my_canvas.pack_forget(),csvTable2.grid_forget(),canvas.get_tk_widget().pack_forget(),clearGraphpage(canvas),my_scrollbar.pack_forget(),Mainscreen(container)])
-        homebutton.grid(row=0,column=1)
-        
+        f = Figure(figsize=(5,5), dpi=100)
+        a = f.add_subplot(111)
+        canvas = FigureCanvasTkAgg(f, second_frame)
+
         # Frame for Treeview
         csvTable2 = LabelFrame(second_frame,text ="CSV data")
         csvTable2.grid(padx=30,pady=25,ipadx=400,ipady=250,row=2,column=1)
@@ -356,12 +351,19 @@ class GraphPage(ttk.Frame):
         treescrollx.pack(side="bottom", fill="x")
         treescrolly.pack(side="right", fill="y")
 
+        OutputDataframe = plotGraph(a,f,canvas,start_page,tv2,csvTable2)
 
-        f = Figure(figsize=(5,5), dpi=100)
-        a = f.add_subplot(111)
-        canvas = FigureCanvasTkAgg(f, container)
+        homebutton = Button(second_frame,state = NORMAL, text="Terug naar startpagina", width=18,
+                            command=lambda: [my_canvas.pack_forget(),csvTable2.grid_forget(),canvas.get_tk_widget().pack_forget(),clearGraphpage(canvas),my_scrollbar.pack_forget(),plot_frame.pack_forget(),Mainscreen(container)])
+        homebutton.grid(row=0,column=1)
 
-        plotGraph(a,f,canvas,start_page,tv2,csvTable2)
+        downloadgraph = Button(second_frame,state = NORMAL, text="Download grafiek", width=18,
+                            command=lambda: [f.set_figheight(10),f.set_figwidth(20),a.get_figure().savefig('downloads/duingroeivoorspelling.png')])
+        downloadgraph.grid(sticky="e",row=0,column=2)
+
+        downloadcsv = Button(second_frame,state = NORMAL, text="Download csv", width=18,
+                            command=lambda: [OutputDataframe.to_csv('downloads/PredictedOutputs.csv', index=False)])
+        downloadcsv.grid(sticky="w",row=0,column=2)
             
 def main():
     root = tk.Tk()

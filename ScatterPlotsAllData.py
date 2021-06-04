@@ -23,46 +23,47 @@ highhumidity, lowhumidity, avghumidity = myCSV.highhumidity, myCSV.lowhumidity, 
 precipitation = myCSV.neerslag
 
 listofWP = [myCSV.windkracht6,myCSV.windkracht7,myCSV.windkracht8,myCSV.windkracht9,myCSV.windkracht10,myCSV.windkracht11,myCSV.windkracht12]
-
-def plotWindPower(duneheight, listofWP):
-    currentWP = 6
-    fig, ax = plt.subplots(2)
-    ax[0].plot(myCSV.year, duneheight, label='duneheight')
-    for wp in listofWP:
-        ax[1].plot(myCSV.year, wp, label='windpower ' + str(currentWP))
-        currentWP += 1
-    plt.xlabel('year')
-    plt.legend()
-    plt.show()
-
-plotWindPower(duneheight1, listofWP)
+'''
+ax1.set_title('damped')
+ax1.set_xlabel('time (s)')
+ax1.set_ylabel('amplitude')
+'''
+currentWP = 6
+fig, ax = plt.subplots(7)
+count = 0
+for wp in listofWP:
+    ax[count].scatter(wp, duneheight1, label='duneheight')
+    ax[count].set_title('Duneheight vs Windpower' + str(currentWP))
+    currentWP += 1
+    count += 1
+    plt.xlabel('Wind power')
+plt.legend()
 
 # Wind direction plots
-fig, ax = plt.subplots(3)
-ax[0].plot(myCSV.year, duneheight1, label='duneheight')
-ax[1].plot(myCSV.year, north, label='north')
-ax[1].plot(myCSV.year, east, label='east')
-ax[1].plot(myCSV.year, south, label='south')
-ax[1].plot(myCSV.year, west, label='west')
-ax[2].plot(myCSV.year, northeast, label='northeast')
-ax[2].plot(myCSV.year, southeast, label='southeast')
-ax[2].plot(myCSV.year, southwest, label='southwest')
-ax[2].plot(myCSV.year, northwest, label='northwest')
-plt.xlabel('year')
+fig, ax = plt.subplots(8)
+#ax[0].plot(myCSV.year, duneheight1, label='duneheight')
+ax[0].scatter(north, duneheight1, label='north')
+ax[1].scatter(east, duneheight1, label='east')
+ax[2].scatter(south, duneheight1, label='south')
+ax[3].scatter(west, duneheight1, label='west')
+ax[4].scatter(northeast, duneheight1, label='northeast')
+ax[5].scatter(southeast, duneheight1, label='southeast')
+ax[6].scatter(southwest, duneheight1, label='southwest')
+ax[7].scatter(northwest, duneheight1, label='northwest')
+plt.xlabel('Wind direction')
 plt.legend()
-plt.show()
 
 # Humidity
-fig, ax = plt.subplots(2)
-ax[0].scatter(myCSV.year, duneheight1, label='duneheight')
-ax[1].scatter(myCSV.year, highhumidity, label='high humidity')
-ax[1].scatter(myCSV.year, lowhumidity, label='low humidity')
-ax[1].scatter(myCSV.year, avghumidity, label='avg humidity')
-plt.show()
+fig, ax = plt.subplots(3)
+#ax[0].scatter(myCSV.year, duneheight1, label='duneheight')
+ax[0].scatter(highhumidity, duneheight1, label='high humidity')
+ax[1].scatter(lowhumidity, duneheight1, label='low humidity')
+ax[2].scatter(avghumidity, duneheight1, label='avg humidity')
 
 # Precipitation
-plt.scatter(myCSV.year, duneheight1, label='duneheight')
-plt.scatter(myCSV.year, precipitation, label='precipitation')
+plt.scatter(precipitation, duneheight1, label='duneheight')
+plt.legend()
+#ax[0].scatter(myCSV.year, precipitation, label='precipitation')
 plt.show()
 
 

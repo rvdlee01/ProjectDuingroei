@@ -294,12 +294,12 @@ def plotGraph(a,f,canvas,startpage,tv2,csvTable2):
     for i in tv2.get_children():
         tv2.delete(i)
 
-    tv2["column"] = list(df.columns)
+    tv2["column"] = list(OutputDataframe.columns)
     tv2["show"] = "headings"
     for column in tv2["columns"]:
         tv2.heading(column, text=column)
             
-    df_rows = df.to_numpy().tolist()
+    df_rows = OutputDataframe.to_numpy().tolist()
     for row in df_rows:
         tv2.insert("", "end", values=row)
 

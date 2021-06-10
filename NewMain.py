@@ -273,14 +273,14 @@ def plotGraph(a,b,f,canvas,startpage,tv2,csvTable2):
     userOutputx, userOutputy = convertToList(years[listOfDataset.shape[0]:listOfDataset.shape[0]+1], inputPredict)
 
     a.clear()
-    a.plot(datasetPredictedx, datasetPredictedy,label="dataset predicted values")
-    a.scatter(userOutputx,userOutputy,label="predicted user input")
+    a.plot(datasetPredictedx, datasetPredictedy,label="dataset predicted values",color='green')
+    a.scatter(userOutputx,userOutputy,label="predicted user input",color='blue')
 
     a.legend()
 
     b.clear()
-    b.plot(datasetActualx, datasetActualy,label="dataset actual values")
-    b.scatter(userOutputx,datasetActualy[-1]+difference[0],label="predicted user input")
+    b.plot(datasetActualx, datasetActualy,label="dataset actual values",color='purple')
+    b.scatter(userOutputx,datasetActualy[-1]+difference[0],label="predicted user input",color='blue')
 
     b.legend()
     

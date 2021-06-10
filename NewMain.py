@@ -34,7 +34,7 @@ def model_NN(filename,inputX):
     x = df[['windkracht6','windkracht7','windkracht8','windkracht9','windkracht10','windkracht11','windkracht12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','aveghumidity','neerslag']]
     y = df['punt1'].values
     #90% training data & 10% testing data
-    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.1, random_state=0)
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.1, random_state=0) #shuffle=False/True
 
     x_userinput = inputX[['windkracht6','windkracht7','windkracht8','windkracht9','windkracht10','windkracht11','windkracht12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','aveghumidity','neerslag']]
     
@@ -57,8 +57,8 @@ def model_NN(filename,inputX):
     model.add(Dense(1, activation='relu')) #maybe sigmoid? max 3 layers!
     model.compile(loss='mse', optimizer='adam')
 
-    #print(model.summary())
-    model.fit(x_train,y_train, epochs=10, batch_size=50, verbose=0)
+    #train model
+    model.fit(x_train,y_train, epochs=10, batch_size=50, verbose=0) #shuffle=False/True
 
     #predictions 
     trainPredict = model.predict(x_train)
@@ -294,12 +294,12 @@ def plotGraph(a,f,canvas,startpage,tv2,csvTable2):
     for i in tv2.get_children():
         tv2.delete(i)
 
-    tv2["column"] = list(df.columns)
+    tv2["column"] = list(OutputDataframe.columns)
     tv2["show"] = "headings"
     for column in tv2["columns"]:
         tv2.heading(column, text=column)
             
-    df_rows = df.to_numpy().tolist()
+    df_rows = OutputDataframe.to_numpy().tolist()
     for row in df_rows:
         tv2.insert("", "end", values=row)
 

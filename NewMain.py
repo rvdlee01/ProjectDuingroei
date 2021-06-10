@@ -119,6 +119,11 @@ class Mainscreen(ttk.Frame):
         my_canvas = Canvas(main_frame)
         my_canvas.pack(side=LEFT, fill=BOTH, expand=1)
 
+        def OnMouseWheel(event):
+            my_canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+
+        my_canvas.bind_all("<MouseWheel>",OnMouseWheel)
+
         my_scrollbar = ttk.Scrollbar(main_frame, orient=VERTICAL, command=my_canvas.yview)
         my_scrollbar.pack(side=RIGHT, fill=Y)
 
@@ -181,7 +186,7 @@ class Mainscreen(ttk.Frame):
             elif value == 'precipitation':
                 # Precipitation entry box and label
                 setattr(self,value+'_label',Label(second_frame, text = 'Neerslag in een jaar', font=('calibre',10, 'bold')).grid(padx=30,column=1,sticky="ne"))
-            inputfield = Entry(second_frame, width=25, textvariable = getattr(self,value),validate='all', validatecommand=(vcmd,'%P'), state=DISABLED)
+            inputfield = Entry(second_frame, width=25, textvariable = getattr(self,value),validate='all', validatecommand=(vcmd,'%S'), state=DISABLED)
             inputfield.grid(padx=30,column=1,sticky="ne")
             setattr(self,'entry'+value,inputfield)
         

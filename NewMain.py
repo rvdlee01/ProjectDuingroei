@@ -71,7 +71,6 @@ def model_NN(filename,inputX):
     #convert np arrays to list and add the training and testing results together in a list
     listOfDataset = datasetPredict.tolist()
     listOfInput = inputPredict.tolist()
-    joinedList2 = []
 
     OutputDataframe = dataframeToCSV(y_dataset, listOfDataset, listOfInput, df, scaler, years, inputX)
     return df, scaler.inverse_transform(y_dataset), scaler.inverse_transform(listOfDataset), scaler.inverse_transform(inputPredict), years, OutputDataframe
@@ -163,11 +162,9 @@ class Mainscreen(ttk.Frame):
             if value == 'year':
                 # Year entry box and label
                 setattr(self,value+'_label',Label(second_frame, text = 'Jaar', font=('calibre',10, 'bold')).grid(padx=30,column=1,sticky="ne"))
-                setattr(self,'entry'+value,Entry(second_frame, width=25, textvariable = getattr(self,value),validate='all', validatecommand=(vcmd,'%P')).grid(padx=30,column=1,sticky="ne"))
             elif 'wp' in value:
                 # Wind power entry boxes and labels
                 setattr(self,value+'_label',Label(second_frame, text = 'Aantal dagen met windkracht ' + str(count), font=('calibre',10, 'bold')).grid(padx=30,column=1,sticky="ne"))
-                setattr(self,'entry'+value,Entry(second_frame, width=25, textvariable = getattr(self,value),validate='all', validatecommand=(vcmd,'%P')).grid(padx=30,column=1,sticky="ne"))
                 count += 1
             elif value in dictOfDirections.keys():
                 # Wind direction entry boxes and labels
@@ -175,18 +172,18 @@ class Mainscreen(ttk.Frame):
                     if k == value:
                         textInputWD = 'Aantal dagen met wind vanuit het ' + v
                 setattr(self,value+'_label',Label(second_frame, text = textInputWD, font=('calibre',10, 'bold')).grid(padx=30,column=1,sticky="ne"))
-                setattr(self,'entry'+value,Entry(second_frame, width=25, textvariable = getattr(self,value),validate='all', validatecommand=(vcmd,'%P')).grid(padx=30,column=1,sticky="ne"))
             elif value in dictOfHumidity.keys():
                 # Humidity entry boxes and labels
                 for k, v in dictOfHumidity.items():
                     if k == value:
                         textInputH = 'Aantal dagen met een ' + v
                 setattr(self,value+'_label',Label(second_frame, text = textInputH, font=('calibre',10, 'bold')).grid(padx=30,column=1,sticky="ne"))
-                setattr(self,'entry'+value,Entry(second_frame, width=25, textvariable = getattr(self,value),validate='all', validatecommand=(vcmd,'%P')).grid(padx=30,column=1,sticky="ne"))
             elif value == 'precipitation':
                 # Precipitation entry box and label
                 setattr(self,value+'_label',Label(second_frame, text = 'Neerslag in een jaar', font=('calibre',10, 'bold')).grid(padx=30,column=1,sticky="ne"))
-                setattr(self,'entry'+value,Entry(second_frame, width=25, textvariable = getattr(self,value),validate='all', validatecommand=(vcmd,'%P')).grid(padx=30,column=1,sticky="ne"))
+            inputfield = Entry(second_frame, width=25, textvariable = getattr(self,value),validate='all', validatecommand=(vcmd,'%P'), state=DISABLED)
+            inputfield.grid(padx=30,column=1,sticky="ne")
+            setattr(self,'entry'+value,inputfield)
         
         # Frame for Treeview
         csvTable = LabelFrame(second_frame,text ="CSV data")
@@ -255,11 +252,18 @@ class Mainscreen(ttk.Frame):
             filename = filedialog.askopenfilename(initialdir = "/",title = "Select file",filetypes = [("CSV files", '.csv')])
             if filename != '':
                 boolColumns, boolRows = load_Data(tv1,filename)
+                inputfields = ['year','wp6','wp7','wp8','wp9','wp10','wp11','wp12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','avghumidity','precipitation']
                 if ((boolColumns == False) or (boolRows == False)):
                     predictbutton["state"] = DISABLED
+                    for inputfield in inputfields:
+                        v = getattr(self, 'entry'+inputfield)
+                        getattr(self, 'entry'+inputfield)["state"] = DISABLED
                     uploadbutton.configure(bg="red")
                 if ((boolColumns == True) and (boolRows == True)):
                     predictbutton["state"] = NORMAL
+                    for inputfield in inputfields:
+                        v = getattr(self, 'entry'+inputfield)
+                        getattr(self, 'entry'+inputfield)["state"] = NORMAL
                     uploadbutton.configure(bg="green")
 
 def clearGraphpage(canvas):

@@ -109,20 +109,16 @@ def convertToList(arrayX, arrayY):
         x.append(xas)
     return x, y
 
-
 class Mainscreen(ttk.Frame):
     def __init__(self, container, *args, **kwargs):
         super().__init__(container, *args, **kwargs)
         main_frame = Frame(container)
         main_frame.pack(fill=BOTH, expand=1)
 
-        my_canvas = Canvas(main_frame)
+        my_canvas = Canvas(main_frame, bg='green')
         my_canvas.pack(side=LEFT, fill=BOTH, expand=1)
 
-        def OnMouseWheel(event):
-            my_canvas.yview_scroll(int(-1*(event.delta/120)), "units")
-
-        my_canvas.bind_all("<MouseWheel>",OnMouseWheel)
+        my_canvas.bind_all("<MouseWheel>",lambda event: my_canvas.yview_scroll(int(-1*(event.delta/120)), "units"))
 
         my_scrollbar = ttk.Scrollbar(main_frame, orient=VERTICAL, command=my_canvas.yview)
         my_scrollbar.pack(side=RIGHT, fill=Y)
@@ -136,16 +132,16 @@ class Mainscreen(ttk.Frame):
                 )
             )
 
-        second_frame = Frame(my_canvas)
+        second_frame = Frame(my_canvas, bg='blue')
 
         my_canvas.create_window((0,0), window=second_frame, anchor="nw")
 
         predictbutton = Button(second_frame,state = DISABLED, text="Voorspellen", width=18,
                             command=lambda: [my_canvas.pack_forget(), GraphPage(container, self),my_scrollbar.pack_forget(),main_frame.pack_forget()])
-        predictbutton.grid(row=0,column=1,padx=10,pady=10)
+        predictbutton.grid(row=0,padx=10,pady=10)
         uploadbutton = Button(second_frame, text="CSV bestand selecteren", width=18,
                             command=lambda: getCsvFile(uploadbutton, predictbutton, tv1))
-        uploadbutton.grid(row=1,column=1,padx=10,pady=10)
+        uploadbutton.grid(row=1,padx=10,pady=10)
         
         listOfInputVariables = ['year','wp6','wp7','wp8','wp9','wp10','wp11','wp12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','avghumidity','precipitation']
         dictOfDirections = {'north':'noorden','east':'oosten','south':'zuiden','west':'westen','northeast':'noord-oosten','southeast':'zuid-oosten','southwest':'zuid-westen','northwest':'noord-westen'}
@@ -161,46 +157,61 @@ class Mainscreen(ttk.Frame):
             
         vcmd = (self.register(validateInput))
 
+        rownumber = 2
+        
         for value in listOfInputVariables:
             # Variables for storing data to predict dune height
             setattr(self,value,StringVar())
             if value == 'year':
                 # Year entry box and label
-                setattr(self,value+'_label',Label(second_frame, text = 'Jaar', font=('calibre',10, 'bold')).grid(padx=30,column=1,sticky="ne"))
+                setattr(self,value+'_label',Label(second_frame, text = 'Jaar', font=('calibre',10, 'bold')).grid(padx=30,row=rownumber,column=0,sticky="ne"))
+                rownumber += 1
             elif 'wp' in value:
                 # Wind power entry boxes and labels
-                setattr(self,value+'_label',Label(second_frame, text = 'Aantal dagen met windkracht ' + str(count), font=('calibre',10, 'bold')).grid(padx=30,column=1,sticky="ne"))
+                setattr(self,value+'_label',Label(second_frame, text = 'Aantal dagen met windkracht ' + str(count), font=('calibre',10, 'bold')).grid(padx=30,row=rownumber,column=0,sticky="ne"))
                 count += 1
+                columnnumber = 0
+                rownumber += 1
             elif value in dictOfDirections.keys():
                 # Wind direction entry boxes and labels
                 for k, v in dictOfDirections.items():
                     if k == value:
                         textInputWD = 'Aantal dagen met wind vanuit het ' + v
-                setattr(self,value+'_label',Label(second_frame, text = textInputWD, font=('calibre',10, 'bold')).grid(padx=30,column=1,sticky="ne"))
+                setattr(self,value+'_label',Label(second_frame, text = textInputWD, font=('calibre',10, 'bold')).grid(padx=30,row=rownumber,column=1,sticky="ne"))
+                columnnumber = 1
+                rownumber += 1
             elif value in dictOfHumidity.keys():
                 # Humidity entry boxes and labels
                 for k, v in dictOfHumidity.items():
                     if k == value:
                         textInputH = 'Aantal dagen met een ' + v
-                setattr(self,value+'_label',Label(second_frame, text = textInputH, font=('calibre',10, 'bold')).grid(padx=30,column=1,sticky="ne"))
+                setattr(self,value+'_label',Label(second_frame, text = textInputH, font=('calibre',10, 'bold')).grid(padx=30,row=rownumber,column=2,sticky="ne"))
+                columnnumber = 2
+                rownumber += 1
             elif value == 'precipitation':
                 # Precipitation entry box and label
-                setattr(self,value+'_label',Label(second_frame, text = 'Neerslag in een jaar', font=('calibre',10, 'bold')).grid(padx=30,column=1,sticky="ne"))
+                setattr(self,value+'_label',Label(second_frame, text = 'Neerslag in een jaar', font=('calibre',10, 'bold')).grid(padx=30,row=rownumber,column=2,sticky="ne"))
+                columnnumber = 2
+                rownumber += 1
             if value != 'year':
                 inputfield = Entry(second_frame, width=25, textvariable = getattr(self,value),validate='all', validatecommand=(vcmd,'%P'), state=DISABLED)
-                inputfield.grid(padx=30,column=1,sticky="ne")
+                inputfield.grid(padx=30,row=rownumber,column=columnnumber,sticky="ne")
                 setattr(self,'entry'+value,inputfield)
+                rownumber += 1
+                if value == 'wp12' or value == 'northwest':
+                    rownumber = 2
             else:
                 self.defaultSelect = StringVar(second_frame)
                 self.defaultSelect.set(2021) # default value
                 selectbox = OptionMenu(second_frame, self.defaultSelect, 2021)
-                selectbox.grid(padx=30,column=1,sticky="ne")
+                selectbox.grid(padx=30,row=rownumber, column=0,sticky="ne")
                 selectbox['state'] = DISABLED
+                rownumber += 1
                 setattr(self,'entry'+value,selectbox)
         
         # Frame for Treeview
         csvTable = LabelFrame(second_frame,text ="CSV data")
-        csvTable.grid(padx=30,pady=25,ipadx=400,ipady=250,row=41,column=1)
+        csvTable.grid(padx=30,pady=25,ipadx=400,ipady=250,row=41,columnspan=1)
 
         # Treeview Widget
         tv1 = ttk.Treeview(csvTable)
@@ -337,6 +348,8 @@ class GraphPage(ttk.Frame):
 
         my_canvas = Canvas(plot_frame)
         my_canvas.pack(side=LEFT, fill=BOTH, expand=1)
+
+        my_canvas.bind_all("<MouseWheel>",lambda event: my_canvas.yview_scroll(int(-1*(event.delta/120)), "units"))
 
         my_scrollbar = ttk.Scrollbar(plot_frame, orient=VERTICAL, command=my_canvas.yview)
         my_scrollbar.pack(side=RIGHT, fill=Y)

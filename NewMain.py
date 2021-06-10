@@ -119,6 +119,11 @@ class Mainscreen(ttk.Frame):
         my_canvas = Canvas(main_frame)
         my_canvas.pack(side=LEFT, fill=BOTH, expand=1)
 
+        def OnMouseWheel(event):
+            my_canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+
+        my_canvas.bind_all("<MouseWheel>",OnMouseWheel)
+
         my_scrollbar = ttk.Scrollbar(main_frame, orient=VERTICAL, command=my_canvas.yview)
         my_scrollbar.pack(side=RIGHT, fill=Y)
 

@@ -16,6 +16,7 @@ from tkinter import font
 import numpy as np
 import matplotlib.pyplot as plt
 
+import keras
 from keras.models import Sequential
 from keras.models import Model
 from keras.layers import Dense
@@ -26,6 +27,18 @@ from sklearn.metrics import r2_score
 LARGE_FONT = ("Verdana", 12)
 filename =''
 
+def detect_outlier(data):
+    outliers=[]
+    threshold=3
+    mean = np.mean(data)
+    std =np.std(data)
+    
+    for y in data:
+        z_score= (y - mean)/std 
+        if np.abs(z_score) > threshold:
+            outliers.append(y)
+    return outliers
+
 def model_NN(filename,inputX):
     df = pd.read_csv(filename)
     df=df[df['year'] > 2002]
@@ -33,65 +46,48 @@ def model_NN(filename,inputX):
     df['YYYYMMDD'] = df['year']
     x = df[['windkracht6','windkracht7','windkracht8','windkracht9','windkracht10','windkracht11','windkracht12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','aveghumidity','neerslag']]
     y = df['punt1'].values
-    #90% training data & 10% testing data
-    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.1, random_state=0) #shuffle=False/True
+
+    #detect outliers
+    outliers = detect_outlier(df['punt1'])
+    print('outliers: ', outliers)
 
     x_userinput = inputX[['windkracht6','windkracht7','windkracht8','windkracht9','windkracht10','windkracht11','windkracht12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','aveghumidity','neerslag']]
     
     #Standardize data
     scaler = StandardScaler()
 
-    x_train = scaler.fit_transform(x_train)
-    x_test = scaler.transform(x_test)
+    x_dataset = scaler.fit_transform(x)
     x_userinput = scaler.transform(x_userinput)
+    
+    y_dataset = scaler.fit_transform(np.array(y).reshape(-1,1))
 
-    y_train = scaler.fit_transform(np.array(y_train).reshape(-1,1))
-    y_test = scaler.transform(np.array(y_test).reshape(-1,1))
-
-    #Adding dense layers
-    model = Sequential()
-    model.add(Dense(128, input_dim=19, activation='relu'))
-    model.add(Dense(64, activation='relu'))
-    model.add(Dense(32, activation='relu'))
-    model.add(Dense(16, activation='relu'))
-    model.add(Dense(1, activation='relu')) #maybe sigmoid? max 3 layers!
-    model.compile(loss='mse', optimizer='adam')
-
-    #train model
-    model.fit(x_train,y_train, epochs=10, batch_size=50, verbose=0) #shuffle=False/True
-
+    model = keras.models.load_model('model')
+    
     #predictions 
-    trainPredict = model.predict(x_train)
-    testPredict = model.predict(x_test)
+    datasetPredict = model.predict(x_dataset)
     inputPredict = model.predict(x_userinput) 
     years = df['YYYYMMDD'].tolist()
     
     #convert np arrays to list and add the training and testing results together in a list
-    listOfTraining = trainPredict.tolist()
-    listOfTesting = testPredict.tolist()
+    listOfDataset = datasetPredict.tolist()
     listOfInput = inputPredict.tolist()
-    joinedList = listOfTraining + listOfTesting
     joinedList2 = []
 
-    OutputDataframe = dataframeToCSV(y_train, y_test,joinedList2,joinedList,df,scaler,years,listOfInput,inputX)
-    return df, y_train,y_test, scaler.inverse_transform(y_train),scaler.inverse_transform(trainPredict), scaler.inverse_transform(y_test), scaler.inverse_transform(testPredict), scaler.inverse_transform(inputPredict), years,scaler.inverse_transform(joinedList), scaler.inverse_transform(joinedList2),OutputDataframe
+    OutputDataframe = dataframeToCSV(y_dataset, listOfDataset, listOfInput, df, scaler, years, inputX)
+    return df, scaler.inverse_transform(y_dataset), scaler.inverse_transform(listOfDataset), scaler.inverse_transform(inputPredict), years, OutputDataframe
 
-def dataframeToCSV(y_train, y_test,joinedList2,joinedList,df,scaler,years,listOfInput,inputX):
-    y_train, y_test = convertToList(y_train, y_test)
-    for i in y_train + y_test:
-        joinedList2.append(i)
-    #convert array(list[]) to integer
+def dataframeToCSV(y_dataset, listOfDataset, listOfInput, df, scaler, years, inputX):
     predictedList = []
     actualList = []
     differences = []
     errorrates = []
     count = 0
     for date in df['YYYYMMDD']:
-        predictedList.append(int(float(scaler.inverse_transform(joinedList[count]))))
-        actualList.append(int(float(scaler.inverse_transform(joinedList2[count]))))
-        differences.append(int(float(scaler.inverse_transform(joinedList[count]))) - int(float(scaler.inverse_transform(joinedList2[count]))))
-        errorrates.append((int(float(scaler.inverse_transform(joinedList[count]))) - int(float(scaler.inverse_transform(joinedList2[count]))))
-                            / int(float(scaler.inverse_transform(joinedList2[count]))) * 100)
+        predictedList.append(int(float(scaler.inverse_transform(listOfDataset[count]))))
+        actualList.append(int(float(scaler.inverse_transform(y_dataset[count]))))
+        differences.append(int(float(scaler.inverse_transform(listOfDataset[count]))) - int(float(scaler.inverse_transform(y_dataset[count]))))
+        errorrates.append((int(float(scaler.inverse_transform(listOfDataset[count]))) - int(float(scaler.inverse_transform(y_dataset[count]))))
+                            / int(float(scaler.inverse_transform(y_dataset[count]))) * 100)
         count = count + 1
     #add prediction of userinput to the lists
     predictedList.append(int(float(scaler.inverse_transform(listOfInput[0]))))
@@ -261,35 +257,35 @@ def clearGraphpage(canvas):
         canvas.get_tk_widget().delete(item)
 
 
-def plotGraph(a,f,canvas,startpage,tv2,csvTable2):
+def plotGraph(a,b,f,canvas,startpage,tv2,csvTable2):
     start_page = startpage
     inputX = pd.DataFrame(columns=['year','windkracht6','windkracht7','windkracht8','windkracht9','windkracht10','windkracht11','windkracht12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','aveghumidity','neerslag'])
     inputX.loc[0] = [start_page.year.get(),start_page.wp6.get(),start_page.wp7.get(),start_page.wp8.get(),start_page.wp9.get(),start_page.wp10.get(),start_page.wp11.get(),start_page.wp12.get(),start_page.north.get(),start_page.east.get(),
                 start_page.south.get(),start_page.west.get(),start_page.northeast.get(),start_page.southeast.get(),start_page.southwest.get(),start_page.northwest.get(),start_page.highhumidity.get(),start_page.lowhumidity.get()
                 ,start_page.avghumidity.get(),start_page.precipitation.get()]
             
-    df,y_train,y_test,train_actual,train_predict,test_actual,test_predict,userOutput,years,listoftraining,listoftesting,OutputDataframe = model_NN(filename,inputX)
-    print('prediction of userinput: ', userOutput)
-    ax, ay = convertToList(years[:y_train.shape[0]], train_actual)
-    bx, by = convertToList(years[:y_train.shape[0]], train_predict)
-    cx, cy = convertToList(years[y_train.shape[0]:y_train.shape[0]+y_test.shape[0]], test_actual)
-    dx, dy = convertToList(years[y_train.shape[0]:y_train.shape[0]+y_test.shape[0]], test_predict)
-    userOutputx, userOutputy = convertToList(years[y_train.shape[0]+y_test.shape[0]:y_train.shape[0]+y_test.shape[0]+1], userOutput)
-    trainingx, trainingy = convertToList(years[:y_train.shape[0]+y_test.shape[0]], listoftraining)
-    testingx, testingy = convertToList(years[:y_train.shape[0]+y_test.shape[0]], listoftesting)
+    df, y_dataset, listOfDataset, inputPredict, years, OutputDataframe = model_NN(filename,inputX)
+    print('prediction of userinput: ', inputPredict)
+    difference = inputPredict[0] - listOfDataset[-1]
+    print('difference: ', difference)
+    datasetActualx, datasetActualy = convertToList(years[:listOfDataset.shape[0]], y_dataset)
+    datasetPredictedx, datasetPredictedy = convertToList(years[:listOfDataset.shape[0]], listOfDataset)
+    userOutputx, userOutputy = convertToList(years[listOfDataset.shape[0]:listOfDataset.shape[0]+1], inputPredict)
 
     a.clear()
-    a.plot(trainingx,trainingy,label="predicted values")
-    a.plot(testingx,testingy,label="actual values")
-    a.plot(ax,ay,label="actual training values")
-    a.plot(bx,by,label="predicted training values")
-    a.plot(cx,cy,label="actual testing values")
-    a.plot(dx,dy,label="predicted testing values")
-    a.scatter(userOutputx,userOutputy,label="predicted user input")
+    a.plot(datasetPredictedx, datasetPredictedy,label="dataset predicted values",color='green')
+    a.scatter(userOutputx,userOutputy,label="predicted user input",color='blue')
 
     a.legend()
+
+    b.clear()
+    b.plot(datasetActualx, datasetActualy,label="dataset actual values",color='purple')
+    b.scatter(userOutputx,datasetActualy[-1]+difference[0],label="predicted user input",color='blue')
+
+    b.legend()
+    
     canvas.draw()
-    canvas.get_tk_widget().grid(sticky="n", column=2,row=1)
+    canvas.get_tk_widget().grid(sticky="n", column=1,row=2)
 
     for i in tv2.get_children():
         tv2.delete(i)
@@ -303,7 +299,7 @@ def plotGraph(a,f,canvas,startpage,tv2,csvTable2):
     for row in df_rows:
         tv2.insert("", "end", values=row)
 
-    csvTable2.grid(sticky='n',ipadx=400,ipady=250, pady=25,column=1,row=1)
+    csvTable2.grid(sticky='n',ipadx=400,ipady=250, pady=25,column=1,row=3)
 
     return OutputDataframe
 
@@ -333,8 +329,9 @@ class GraphPage(ttk.Frame):
 
         my_canvas.create_window((0,0), window=second_frame, anchor="nw")
 
-        f = Figure(figsize=(5,5), dpi=100)
-        a = f.add_subplot(111)
+        f = Figure(figsize=(10,10), dpi=100)
+        a = f.add_subplot(221)
+        b = f.add_subplot(223)
         canvas = FigureCanvasTkAgg(f, second_frame)
 
         # Frame for Treeview
@@ -351,19 +348,19 @@ class GraphPage(ttk.Frame):
         treescrollx.pack(side="bottom", fill="x")
         treescrolly.pack(side="right", fill="y")
 
-        OutputDataframe = plotGraph(a,f,canvas,start_page,tv2,csvTable2)
+        OutputDataframe = plotGraph(a,b,f,canvas,start_page,tv2,csvTable2)
 
         homebutton = Button(second_frame,state = NORMAL, text="Terug naar startpagina", width=18,
                             command=lambda: [my_canvas.pack_forget(),csvTable2.grid_forget(),canvas.get_tk_widget().pack_forget(),clearGraphpage(canvas),my_scrollbar.pack_forget(),plot_frame.pack_forget(),Mainscreen(container)])
         homebutton.grid(row=0,column=1)
 
         downloadgraph = Button(second_frame,state = NORMAL, text="Download grafiek", width=18,
-                            command=lambda: [f.set_figheight(10),f.set_figwidth(20),a.get_figure().savefig('downloads/duingroeivoorspelling.png')])
-        downloadgraph.grid(sticky="e",row=0,column=2)
+                            command=lambda: [f.set_figheight(10),f.set_figwidth(20),f.savefig('downloads/duingroeivoorspelling.png', bbox_inches=b.get_window_extent().transformed(f.dpi_scale_trans.inverted()).expanded(1.2, 1.2))])
+        downloadgraph.grid(sticky="e",row=1,column=1)
 
         downloadcsv = Button(second_frame,state = NORMAL, text="Download csv", width=18,
                             command=lambda: [OutputDataframe.to_csv('downloads/PredictedOutputs.csv', index=False)])
-        downloadcsv.grid(sticky="w",row=0,column=2)
+        downloadcsv.grid(sticky="w",row=1,column=1)
             
 def main():
     root = tk.Tk()

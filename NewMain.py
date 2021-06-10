@@ -95,7 +95,7 @@ def dataframeToCSV(y_dataset, listOfDataset, listOfInput, df, scaler, years, inp
     errorrates.append(None)
     years.append(int(inputX['year'].values))
     #assign list to column
-    newDataframe = {'Date': years, 'Predicted': predictedList, 'Actual': actualList, 'Difference': differences, 'Error rate': errorrates}
+    newDataframe = {'Jaar': years, 'Voorspelling': predictedList, 'Daadwerkelijk': actualList, 'Verschil': differences, 'Foutpercentage': errorrates}
     #create dataframe
     OutputDataframe = pd.DataFrame(newDataframe)
     print(OutputDataframe)
@@ -181,9 +181,17 @@ class Mainscreen(ttk.Frame):
             elif value == 'precipitation':
                 # Precipitation entry box and label
                 setattr(self,value+'_label',Label(second_frame, text = 'Neerslag in een jaar', font=('calibre',10, 'bold')).grid(padx=30,column=1,sticky="ne"))
-            inputfield = Entry(second_frame, width=25, textvariable = getattr(self,value),validate='all', validatecommand=(vcmd,'%P'), state=DISABLED)
-            inputfield.grid(padx=30,column=1,sticky="ne")
-            setattr(self,'entry'+value,inputfield)
+            if value != 'year':
+                inputfield = Entry(second_frame, width=25, textvariable = getattr(self,value),validate='all', validatecommand=(vcmd,'%P'), state=DISABLED)
+                inputfield.grid(padx=30,column=1,sticky="ne")
+                setattr(self,'entry'+value,inputfield)
+            else:
+                self.defaultSelect = StringVar(second_frame)
+                self.defaultSelect.set(2021) # default value
+                selectbox = OptionMenu(second_frame, self.defaultSelect, 2021)
+                selectbox.grid(padx=30,column=1,sticky="ne")
+                selectbox['state'] = DISABLED
+                setattr(self,'entry'+value,selectbox)
         
         # Frame for Treeview
         csvTable = LabelFrame(second_frame,text ="CSV data")
@@ -256,13 +264,11 @@ class Mainscreen(ttk.Frame):
                 if ((boolColumns == False) or (boolRows == False)):
                     predictbutton["state"] = DISABLED
                     for inputfield in inputfields:
-                        v = getattr(self, 'entry'+inputfield)
                         getattr(self, 'entry'+inputfield)["state"] = DISABLED
                     uploadbutton.configure(bg="red")
                 if ((boolColumns == True) and (boolRows == True)):
                     predictbutton["state"] = NORMAL
                     for inputfield in inputfields:
-                        v = getattr(self, 'entry'+inputfield)
                         getattr(self, 'entry'+inputfield)["state"] = NORMAL
                     uploadbutton.configure(bg="green")
 
@@ -274,7 +280,7 @@ def clearGraphpage(canvas):
 def plotGraph(a,b,f,canvas,startpage,tv2,csvTable2):
     start_page = startpage
     inputX = pd.DataFrame(columns=['year','windkracht6','windkracht7','windkracht8','windkracht9','windkracht10','windkracht11','windkracht12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','aveghumidity','neerslag'])
-    inputX.loc[0] = [start_page.year.get(),start_page.wp6.get(),start_page.wp7.get(),start_page.wp8.get(),start_page.wp9.get(),start_page.wp10.get(),start_page.wp11.get(),start_page.wp12.get(),start_page.north.get(),start_page.east.get(),
+    inputX.loc[0] = [start_page.defaultSelect.get(),start_page.wp6.get(),start_page.wp7.get(),start_page.wp8.get(),start_page.wp9.get(),start_page.wp10.get(),start_page.wp11.get(),start_page.wp12.get(),start_page.north.get(),start_page.east.get(),
                 start_page.south.get(),start_page.west.get(),start_page.northeast.get(),start_page.southeast.get(),start_page.southwest.get(),start_page.northwest.get(),start_page.highhumidity.get(),start_page.lowhumidity.get()
                 ,start_page.avghumidity.get(),start_page.precipitation.get()]
             

@@ -41,7 +41,7 @@ def detect_outlier(data):
 
 def model_NN(filename,inputX):
     df = pd.read_csv(filename)
-    df=df[df['year'] > 2002]
+    df=df[df['year'] > 2002] #TEMP
 
     df['YYYYMMDD'] = df['year']
     x = df[['windkracht6','windkracht7','windkracht8','windkracht9','windkracht10','windkracht11','windkracht12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','aveghumidity','neerslag']]
@@ -66,36 +66,46 @@ def model_NN(filename,inputX):
     #predictions 
     datasetPredict = model.predict(x_dataset)
     inputPredict = model.predict(x_userinput) 
-    years = df['YYYYMMDD'].tolist()
+    years = []
+    yearsList = df['YYYYMMDD'].tolist()
+    shuffledYearsList = []
     
     #convert np arrays to list and add the training and testing results together in a list
     listOfDataset = datasetPredict.tolist()
     listOfInput = inputPredict.tolist()
 
-    OutputDataframe = dataframeToCSV(y_dataset, listOfDataset, listOfInput, df, scaler, years, inputX)
+    OutputDataframe = dataframeToCSV(y_dataset, listOfDataset, listOfInput, df, scaler, years, inputX, yearsList,inputPredict, shuffledYearsList)
     return df, scaler.inverse_transform(y_dataset), scaler.inverse_transform(listOfDataset), scaler.inverse_transform(inputPredict), years, OutputDataframe
 
-def dataframeToCSV(y_dataset, listOfDataset, listOfInput, df, scaler, years, inputX):
+def dataframeToCSV(y_dataset, listOfDataset, listOfInput, df, scaler, years, inputX, yearsList,inputPredict, shuffledYearsList):
     predictedList = []
     actualList = []
+    actualListUpdated = []
     differences = []
     errorrates = []
     count = 0
     for date in df['YYYYMMDD']:
         predictedList.append(int(float(scaler.inverse_transform(listOfDataset[count]))))
         actualList.append(int(float(scaler.inverse_transform(y_dataset[count]))))
+        actualListUpdated.append(int(float(scaler.inverse_transform(y_dataset[count]))))
         differences.append(int(float(scaler.inverse_transform(listOfDataset[count]))) - int(float(scaler.inverse_transform(y_dataset[count]))))
         errorrates.append((int(float(scaler.inverse_transform(listOfDataset[count]))) - int(float(scaler.inverse_transform(y_dataset[count]))))
                             / int(float(scaler.inverse_transform(y_dataset[count]))) * 100)
+        shuffledYearsList.append("YYYY")
+        years.append(count)
         count = count + 1
     #add prediction of userinput to the lists
     predictedList.append(int(float(scaler.inverse_transform(listOfInput[0]))))
-    actualList.append(None)
+    actualList.append(None) #None
+    actualListUpdated.append(int(scaler.inverse_transform(y_dataset)[-1]+(scaler.inverse_transform(inputPredict)[0] - scaler.inverse_transform(listOfDataset)[-1])))
     differences.append(None)
     errorrates.append(None)
-    years.append(int(inputX['year'].values))
+    years.append(count + 1)
+    yearsList.append(int(inputX['year'].values))
+    shuffledYearsList.append(int(inputX['year'].values))
     #assign list to column
-    newDataframe = {'Jaar': years, 'Voorspelling': predictedList, 'Daadwerkelijk': actualList, 'Verschil': differences, 'Foutpercentage': errorrates}
+    #newDataframe = {'Jaar': yearsList, 'Voorspelling': predictedList, 'Daadwerkelijk': actualList, 'Verschil': differences, 'Foutpercentage': errorrates}
+    newDataframe = {'Jaar': yearsList, 'Duinhoogte': actualListUpdated, 'Jaar van voorspelling': shuffledYearsList, 'Voorspelling': predictedList, 'Daadwerkelijk': actualList, 'Verschil': differences, 'Foutpercentage': errorrates}
     #create dataframe
     OutputDataframe = pd.DataFrame(newDataframe)
     print(OutputDataframe)

@@ -162,7 +162,7 @@ class Mainscreen(ttk.Frame):
 
         # Validates if input is an integer
         def validateInput(P):
-            if str.isdigit(P):
+            if str.isdigit(P) and (int(P) <= 365) or P == '':
                 return True
             else:
                 return False

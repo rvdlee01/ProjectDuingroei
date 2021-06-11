@@ -115,7 +115,7 @@ class Mainscreen(ttk.Frame):
         main_frame = Frame(container)
         main_frame.pack(fill=BOTH, expand=1)
 
-        my_canvas = Canvas(main_frame, bg='green')
+        my_canvas = Canvas(main_frame)
         my_canvas.pack(side=LEFT, fill=BOTH, expand=1)
 
         my_canvas.bind_all("<MouseWheel>",lambda event: my_canvas.yview_scroll(int(-1*(event.delta/120)), "units"))
@@ -134,11 +134,9 @@ class Mainscreen(ttk.Frame):
 
         second_frame = Frame(my_canvas, bg='blue')
 
-        #my_canvas.create_window((0,0), window=second_frame, anchor="nw")
-
-        x0 = my_canvas.winfo_screenwidth()/2
-        y0 = my_canvas.winfo_screenheight()/2
-        my_canvas.create_window((x0,y0), window=second_frame, anchor = "center")
+        #x0 = my_canvas.winfo_screenwidth()/2
+        #y0 = my_canvas.winfo_screenheight()/2
+        my_canvas.create_window((0,0), window=second_frame, anchor = "center")
 
         predictbutton = Button(second_frame,state = DISABLED, text="Voorspellen", width=18,
                             command=lambda: [my_canvas.pack_forget(), GraphPage(container, self),my_scrollbar.pack_forget(),main_frame.pack_forget()])
@@ -209,7 +207,7 @@ class Mainscreen(ttk.Frame):
         
         # Frame for Treeview
         csvTable = LabelFrame(second_frame,text ="CSV data")
-        csvTable.grid(padx=30,pady=25,ipadx=400,ipady=250,row=41,columnspan=3)
+        csvTable.grid(padx=30,pady=25,ipadx=400,ipady=250,row=41,columnspan=6)
 
         # Treeview Widget
         tv1 = ttk.Treeview(csvTable)
@@ -400,7 +398,7 @@ class GraphPage(ttk.Frame):
             
 def main():
     root = tk.Tk()
-    root.geometry('1200x800')
+    root.geometry('1400x800')
 
     Mainscreen(root)
     

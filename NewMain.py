@@ -168,39 +168,39 @@ class Mainscreen(ttk.Frame):
             setattr(self,value,StringVar())
             if value == 'year':
                 # Year entry box and label
-                setattr(self,value+'_label',Label(second_frame, text = 'Jaar', font=('calibre',10, 'bold')).grid(padx=30,row=rownumber,column=0,sticky="nw"))
+                setattr(self,value+'_label',Label(second_frame, text = 'Jaar', font=('calibre',10, 'bold')).grid(padx=30,row=rownumber,column=0,sticky="ne"))
             elif 'wp' in value:
                 # Wind power entry boxes and labels
-                setattr(self,value+'_label',Label(second_frame, text = 'Aantal dagen met windkracht ' + str(count), font=('calibre',10, 'bold')).grid(padx=30,row=rownumber,column=0,sticky="nw"))
+                setattr(self,value+'_label',Label(second_frame, text = 'Aantal dagen met windkracht ' + str(count), font=('calibre',10, 'bold')).grid(padx=30,row=rownumber,column=0,sticky="ne"))
                 count += 1
-                columnnumber = 0
+                columnnumber = 1
             elif value in dictOfDirections.keys():
                 # Wind direction entry boxes and labels
                 for k, v in dictOfDirections.items():
                     if k == value:
                         textInputWD = 'Aantal dagen met wind vanuit het ' + v
-                setattr(self,value+'_label',Label(second_frame, text = textInputWD, font=('calibre',10, 'bold')).grid(padx=30,row=rownumber,column=1,sticky="nw"))
-                columnnumber = 1
+                setattr(self,value+'_label',Label(second_frame, text = textInputWD, font=('calibre',10, 'bold')).grid(padx=30,row=rownumber,column=2,sticky="ne"))
+                columnnumber = 3
             elif value in dictOfHumidity.keys():
                 # Humidity entry boxes and labels
                 for k, v in dictOfHumidity.items():
                     if k == value:
                         textInputH = 'Aantal dagen met een ' + v
-                setattr(self,value+'_label',Label(second_frame, text = textInputH, font=('calibre',10, 'bold')).grid(padx=30,row=rownumber,column=2,sticky="nw"))
-                columnnumber = 2
+                setattr(self,value+'_label',Label(second_frame, text = textInputH, font=('calibre',10, 'bold')).grid(padx=30,row=rownumber,column=4,sticky="ne"))
+                columnnumber = 5
             elif value == 'precipitation':
                 # Precipitation entry box and label
-                setattr(self,value+'_label',Label(second_frame, text = 'Neerslag in een jaar', font=('calibre',10, 'bold')).grid(padx=30,row=rownumber,column=2,sticky="nw"))
-                columnnumber = 2
+                setattr(self,value+'_label',Label(second_frame, text = 'Neerslag in een jaar', font=('calibre',10, 'bold')).grid(padx=30,row=rownumber,column=4,sticky="ne"))
+                columnnumber = 5
             if value != 'year':
-                inputfield = Entry(second_frame, width=25, textvariable = getattr(self,value),validate='all', validatecommand=(vcmd,'%P'), state=DISABLED)
-                inputfield.grid(padx=30,row=rownumber,column=columnnumber,sticky="ne")
+                inputfield = Entry(second_frame, textvariable = getattr(self,value),validate='all', validatecommand=(vcmd,'%P'), state=DISABLED)
+                inputfield.grid(row=rownumber,column=columnnumber,sticky="nw")
                 setattr(self,'entry'+value,inputfield)
             else:
                 self.defaultSelect = StringVar(second_frame)
                 self.defaultSelect.set(2021) # default value
                 selectbox = OptionMenu(second_frame, self.defaultSelect, 2021)
-                selectbox.grid(padx=30,row=rownumber, column=0,sticky="ne")
+                selectbox.grid(ipadx=30,row=rownumber, column=1,sticky="nw")
                 selectbox['state'] = DISABLED
                 setattr(self,'entry'+value,selectbox)
             rownumber += 1

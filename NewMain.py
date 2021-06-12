@@ -289,8 +289,10 @@ class Mainscreen(ttk.Frame):
             else:
                 if(filename == ''):
                     messagebox.showerror("Error", "Upload eerst een CSV bestand en vul vervolgens alle velden in!")
-                else:
+                elif(boolInputs == False):
                     messagebox.showerror("Error", "Vul eerst alle velden in!")
+                else: #moet naar elif veranderd worden voor total days check
+                    messagebox.showerror("Error", "De totaal aantal dagen komen niet met elkaar overeen!\nTotaal aantal dagen bij windkrachten: \nTotaal aantal dagen bij windrichtingen: \nTotaal aantal dagen bij luchtvochtigheid: ")
 
         def checkColumnNames(checklist, csv_columns):
             for element in checklist:

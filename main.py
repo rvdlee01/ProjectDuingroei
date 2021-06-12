@@ -337,9 +337,26 @@ class Mainscreen(ttk.Frame):
                 print("De geüploadde CSV bestand ontbreekt geen gegevens")
                 return True
 
+        def checkYear(df):
+            df = df.sort_values(by=['jaar'])
+            start = df['jaar'].iloc[0]
+            end = df['jaar'].iloc[-1]
+            message = ""
+            for i in range(start,end+1,1):
+                if i not in list(df.jaar):
+                    message += " {}".format(i)
+            if message == "":
+                return True,message
+            else:
+                return False,message
+                    
         def load_Data(tv1,csv_data):
             try:
                 df = pd.read_csv(csv_data)
+
+                boolYear,message = checkYear(df)
+                if (boolYear):
+                    df = df.sort_values(by=['jaar'])
                 #clear treeview
                 for row in tv1.get_children():
                     tv1.delete(row)
@@ -351,7 +368,6 @@ class Mainscreen(ttk.Frame):
                 df_rows = df.to_numpy().tolist()
                 for row in df_rows:
                     tv1.insert("", "end", values=row)
-
                 # list with column names of user
                 list_of_column_names = list(df.columns)
                 check_list = ['jaar', ycolumnname] + xcolumnnames
@@ -363,16 +379,19 @@ class Mainscreen(ttk.Frame):
                 #detect outliers
                 #outliers = detect_outlier(df['duinhoogte'])
                 #print('outliers: ', outliers)
-                return boolColumns, boolRows, boolValues
+                return boolColumns, boolRows, boolValues, boolYear, message
             except:
-                tk.messagebox.showerror("Error", "Wrong file or file format!")
+                tk.messagebox.showerror("Error", "Ongeldig bestand")
             return None
 
         def getCsvFile(uploadbutton, predictbutton, tv1): #treeview, buttons
             global filename
             filename = filedialog.askopenfilename(initialdir = "/",title = "Select file",filetypes = [("CSV files", '.csv')])
             if filename != '':
-                boolColumns, boolRows, boolValues = load_Data(tv1,filename)
+                boolColumns, boolRows, boolValues, boolYear, message = load_Data(tv1,filename)
+                if boolYear == False:
+                    messagebox.showerror("Error", "Het bestand bevat de volgende ontbrekende jaren:"+message)
+                    return
                 if ((boolColumns == False) or (boolRows == False) or (boolValues == False)):
                     for inputfield in listOfInputVariables:
                         getattr(self, 'entry'+inputfield)["state"] = DISABLED

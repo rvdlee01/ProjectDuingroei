@@ -46,10 +46,6 @@ def model_NN(filename,inputX):
     x = df[['windkracht6','windkracht7','windkracht8','windkracht9','windkracht10','windkracht11','windkracht12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','aveghumidity','neerslag']]
     y = df['punt1'].values
 
-    #detect outliers
-    outliers = detect_outlier(df['punt1'])
-    print('outliers: ', outliers)
-
     x_userinput = inputX[['windkracht6','windkracht7','windkracht8','windkracht9','windkracht10','windkracht11','windkracht12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','aveghumidity','neerslag']]
     
     #Standardize data
@@ -284,9 +280,21 @@ class Mainscreen(ttk.Frame):
                 print("Te weinig rows")
                 return False
 
+        def checkValues(df):
+            hasEmptyValues = df.isnull().values.any()
+            if(hasEmptyValues):
+                print("De geüploadde CSV bestand ontbreekt gegevens")
+                return False
+            else:
+                print("De geüploadde CSV bestand ontbreekt geen gegevens")
+                return True
+
         def load_Data(tv1,csv_data):
             try:
                 df = pd.read_csv(csv_data)
+                #clear treeview
+                for row in tv1.get_children():
+                    tv1.delete(row)
                 tv1["column"] = list(df.columns)
                 tv1["show"] = "headings"
                 for column in tv1["columns"]:
@@ -296,17 +304,18 @@ class Mainscreen(ttk.Frame):
                 for row in df_rows:
                     tv1.insert("", "end", values=row)
 
-                # missende data aanvullen met nan
-                df = df.fillna(np.nan)
-                # lijst maken van kolom namen door .columns 
+                # list with column names of user
                 list_of_column_names = list(df.columns)
                 check_list = ['year','punt1','punt2','punt3','windkracht6','windkracht7','windkracht8','windkracht9','windkracht10','windkracht11','windkracht12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','aveghumidity','neerslag']
-                # elk woord in de lijst zetten naar HOOFDLETTERS
+                # make list of column names case insensitive
                 list_of_column_names = [each_string.lower() for each_string in list_of_column_names]
-                #functie aanroepen
                 boolColumns = checkColumnNames(check_list, list_of_column_names)
                 boolRows = checkRows(csv_data)
-                return boolColumns, boolRows
+                boolValues = checkValues(df)
+                #detect outliers
+                outliers = detect_outlier(df['punt1'])
+                print('outliers: ', outliers)
+                return boolColumns, boolRows, boolValues
             except:
                 tk.messagebox.showerror("Error", "Wrong file or file format!")
             return None
@@ -315,13 +324,13 @@ class Mainscreen(ttk.Frame):
             global filename
             filename = filedialog.askopenfilename(initialdir = "/",title = "Select file",filetypes = [("CSV files", '.csv')])
             if filename != '':
-                boolColumns, boolRows = load_Data(tv1,filename)
+                boolColumns, boolRows, boolValues = load_Data(tv1,filename)
                 inputfields = ['year','wp6','wp7','wp8','wp9','wp10','wp11','wp12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','avghumidity','precipitation']
-                if ((boolColumns == False) or (boolRows == False)):
+                if ((boolColumns == False) or (boolRows == False) or (boolValues == False)):
                     for inputfield in inputfields:
                         getattr(self, 'entry'+inputfield)["state"] = DISABLED
                     uploadbutton.configure(bg="red")
-                if ((boolColumns == True) and (boolRows == True)):
+                if ((boolColumns == True) and (boolRows == True) and (boolValues == True)):
                     for inputfield in inputfields:
                         getattr(self, 'entry'+inputfield)["state"] = NORMAL
                     uploadbutton.configure(bg="green")

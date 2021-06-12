@@ -284,15 +284,27 @@ class Mainscreen(ttk.Frame):
                     if(len(getattr(self, 'entry'+inputfield).get()) == 0):
                         boolInputs = False
                         break
-            if(boolInputs):
+            sumOfWP,sumOfDirections,sumOfHumidity = 0,0,0
+            allCategories = listOfWP,list(dictOfDirections.keys()),list(dictOfHumidity.keys())
+            for categorie in allCategories: #wind power / wind direction / humidity
+                for label in categorie: #wind power 6 etc. / north etc. / low etc.
+                    if(getattr(self,label).get() != ''):
+                        if(label in listOfWP):
+                            sumOfWP += int(getattr(self,label).get())
+                        elif(label in list(dictOfDirections.keys())):
+                            sumOfDirections += int(getattr(self,label).get())
+                        elif(label in list(dictOfHumidity.keys())):
+                            sumOfHumidity += int(getattr(self,label).get())
+            if(boolInputs and (sumOfWP == sumOfDirections and sumOfWP == sumOfHumidity)):
                 my_canvas.pack_forget(), GraphPage(container, self),my_scrollbar.pack_forget(),main_frame.pack_forget()
             else:
                 if(filename == ''):
                     messagebox.showerror("Error", "Upload eerst een CSV bestand en vul vervolgens alle velden in!")
                 elif(boolInputs == False):
                     messagebox.showerror("Error", "Vul eerst alle velden in!")
-                else: #moet naar elif veranderd worden voor total days check
-                    messagebox.showerror("Error", "De totaal aantal dagen komen niet met elkaar overeen!\nTotaal aantal dagen bij windkrachten: \nTotaal aantal dagen bij windrichtingen: \nTotaal aantal dagen bij luchtvochtigheid: ")
+                elif(sumOfWP != sumOfDirections or sumOfWP != sumOfHumidity): #moet naar elif veranderd worden voor total days check
+                    messagebox.showerror("Error", "De totaal aantal dagen komen niet met elkaar overeen!\nTotaal aantal dagen bij windkrachten: " + str(sumOfWP)
+                                         + "\nTotaal aantal dagen bij windrichtingen: " + str(sumOfDirections) + "\nTotaal aantal dagen bij luchtvochtigheid: " + str(sumOfHumidity))
 
         def checkColumnNames(checklist, csv_columns):
             for element in checklist:

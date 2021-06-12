@@ -40,11 +40,11 @@ def detect_outlier(data):
 
 def model_NN(filename,inputX):
     df = pd.read_csv(filename)
-    df = df[df['year'] > 2002] #TEMP
+    df = df[df['jaar'] > 2002] #TEMP
 
-    df['YYYYMMDD'] = df['year']
+    df['YYYYMMDD'] = df['jaar']
     x = df[['windkracht6','windkracht7','windkracht8','windkracht9','windkracht10','windkracht11','windkracht12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','aveghumidity','neerslag']]
-    y = df['punt1'].values
+    y = df['duinhoogte'].values
 
     x_userinput = inputX[['windkracht6','windkracht7','windkracht8','windkracht9','windkracht10','windkracht11','windkracht12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','aveghumidity','neerslag']]
     
@@ -88,7 +88,7 @@ def dataframeToCSV(y_dataset, listOfDataset, listOfInput, df, scaler, years, inp
     actualList.append(None)
     differences.append(None)
     errorrates.append(None)
-    years.append(int(inputX['year'].values))
+    years.append(int(inputX['jaar'].values))
     #assign list to column
     newDataframe = {'Jaar': years,'Voorspelling': predictedList, 'Daadwerkelijk': actualList, 'Verschil': differences, 'Foutpercentage': errorrates}
     #create dataframe
@@ -253,9 +253,9 @@ class Mainscreen(ttk.Frame):
                 inputfield.grid(row=rownumber,column=columnnumber,pady=5,sticky="w")
                 setattr(self,'entry'+value,inputfield)
             else:
-                self.defaultSelect = StringVar(second_frame)
-                self.defaultSelect.set(2021) # default value
-                selectbox = OptionMenu(second_frame, self.defaultSelect, 2021)
+                setattr(self,value,StringVar(second_frame))
+                getattr(self,value).set(2021) # default value
+                selectbox = OptionMenu(second_frame, getattr(self,value), 2021)
                 selectbox.grid(ipadx=30,row=rownumber, column=1,sticky="w")
                 selectbox['state'] = DISABLED
                 setattr(self,'entry'+value,selectbox)
@@ -351,15 +351,15 @@ class Mainscreen(ttk.Frame):
 
                 # list with column names of user
                 list_of_column_names = list(df.columns)
-                check_list = ['year','punt1','punt2','punt3','windkracht6','windkracht7','windkracht8','windkracht9','windkracht10','windkracht11','windkracht12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','aveghumidity','neerslag']
+                check_list = ['jaar','duinhoogte','windkracht6','windkracht7','windkracht8','windkracht9','windkracht10','windkracht11','windkracht12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','aveghumidity','neerslag']
                 # make list of column names case insensitive
                 list_of_column_names = [each_string.lower() for each_string in list_of_column_names]
                 boolColumns = checkColumnNames(check_list, list_of_column_names)
                 boolRows = checkRows(csv_data)
                 boolValues = checkValues(df)
                 #detect outliers
-                outliers = detect_outlier(df['punt1'])
-                print('outliers: ', outliers)
+                #outliers = detect_outlier(df['duinhoogte'])
+                #print('outliers: ', outliers)
                 return boolColumns, boolRows, boolValues
             except:
                 tk.messagebox.showerror("Error", "Wrong file or file format!")
@@ -370,13 +370,12 @@ class Mainscreen(ttk.Frame):
             filename = filedialog.askopenfilename(initialdir = "/",title = "Select file",filetypes = [("CSV files", '.csv')])
             if filename != '':
                 boolColumns, boolRows, boolValues = load_Data(tv1,filename)
-                inputfields = ['year','wp6','wp7','wp8','wp9','wp10','wp11','wp12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','avghumidity','precipitation']
                 if ((boolColumns == False) or (boolRows == False) or (boolValues == False)):
-                    for inputfield in inputfields:
+                    for inputfield in listOfInputVariables:
                         getattr(self, 'entry'+inputfield)["state"] = DISABLED
                     uploadbutton.configure(bg="red")
                 if ((boolColumns == True) and (boolRows == True) and (boolValues == True)):
-                    for inputfield in inputfields:
+                    for inputfield in listOfInputVariables:
                         getattr(self, 'entry'+inputfield)["state"] = NORMAL
                     uploadbutton.configure(bg="green")
 
@@ -387,8 +386,8 @@ def clearGraphpage(canvas):
 
 def plotGraph(a,f,canvas,startpage,tv2,csvTable2):
     start_page = startpage
-    inputX = pd.DataFrame(columns=['year','windkracht6','windkracht7','windkracht8','windkracht9','windkracht10','windkracht11','windkracht12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','aveghumidity','neerslag'])
-    inputX.loc[0] = [start_page.defaultSelect.get(),start_page.wp6.get(),start_page.wp7.get(),start_page.wp8.get(),start_page.wp9.get(),start_page.wp10.get(),start_page.wp11.get(),start_page.wp12.get(),start_page.north.get(),start_page.east.get(),
+    inputX = pd.DataFrame(columns=['jaar','windkracht6','windkracht7','windkracht8','windkracht9','windkracht10','windkracht11','windkracht12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','aveghumidity','neerslag'])
+    inputX.loc[0] = [start_page.year.get(),start_page.wp6.get(),start_page.wp7.get(),start_page.wp8.get(),start_page.wp9.get(),start_page.wp10.get(),start_page.wp11.get(),start_page.wp12.get(),start_page.north.get(),start_page.east.get(),
                 start_page.south.get(),start_page.west.get(),start_page.northeast.get(),start_page.southeast.get(),start_page.southwest.get(),start_page.northwest.get(),start_page.highhumidity.get(),start_page.lowhumidity.get()
                 ,start_page.avghumidity.get(),start_page.precipitation.get()]
             

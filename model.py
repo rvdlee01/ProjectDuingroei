@@ -8,11 +8,11 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 
 df = pd.read_csv('newdataColumns.csv')
-df=df[df['year'] > 2002]
+df=df[df['jaar'] > 2002]
 
-df['YYYYMMDD'] = df['year']
+df['YYYYMMDD'] = df['jaar']
 x = df[['windkracht6','windkracht7','windkracht8','windkracht9','windkracht10','windkracht11','windkracht12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','aveghumidity','neerslag']]
-y = df['punt1'].values
+y = df['duinhoogte'].values
     
 #90% training data & 10% testing data
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.1, random_state=0, shuffle=False)

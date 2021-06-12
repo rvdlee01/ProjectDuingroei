@@ -10,7 +10,6 @@ from tkinter import *
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
-
 from tkinter import font
 
 import numpy as np
@@ -155,10 +154,12 @@ class Mainscreen(ttk.Frame):
                         float(P) >= 0
                         return True
                     except:
+                        messagebox.showerror("Error", "Vul een geldig numerieke waarde in")
                         return False
             elif (str.isdigit(P) and (int(P) <= 365 and int(P) >= 0)) or P == '':
                 return True
             else:
+                messagebox.showerror("Error", "Vul een geldig numerieke waarde in.\nDe maximale waarde is 365.\nDe minimale waarde is 0.")
                 return False
             
         vcmd = (self.register(validateInput))

@@ -149,8 +149,13 @@ class Mainscreen(ttk.Frame):
 
         # Validates if input is an integer
         def validateInput(var,P):
-            if (var == 'precipitation' and (float(P) >= 0)) or P == '':
-                return True
+            print(P)
+            if (var == 'precipitation'):
+                    try:
+                        float(P) >= 0
+                        return True
+                    except:
+                        return False
             elif (str.isdigit(P) and (int(P) <= 365 and int(P) >= 0)) or P == '':
                 return True
             else:

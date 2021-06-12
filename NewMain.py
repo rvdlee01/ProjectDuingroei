@@ -173,14 +173,13 @@ class Mainscreen(ttk.Frame):
 
         # Validates if input is an integer
         def validateInput(var,P):
-            print(P)
             if (var == 'precipitation'):
-                    try:
-                        float(P) >= 0
-                        return True
-                    except:
-                        messagebox.showerror("Error", "Vul een geldig numerieke waarde in")
-                        return False
+                try:
+                    P == '' or float(P) >= 0
+                    return True
+                except:
+                    messagebox.showerror("Error", "Vul een geldig numerieke waarde in")
+                    return False
             elif (str.isdigit(P) and (int(P) <= 365 and int(P) >= 0)) or P == '':
                 return True
             else:
@@ -249,13 +248,27 @@ class Mainscreen(ttk.Frame):
         treescrollx.pack(side="bottom", fill="x")
         treescrolly.pack(side="right", fill="y")
 
-        def CheckColumnNames(checklist, csv_columns):
+        def checkInputs():
+            inputfields = ['year','wp6','wp7','wp8','wp9','wp10','wp11','wp12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','avghumidity','precipitation']
+            boolInputs = True
+            for inputfield in inputfields:
+                if(inputfield != 'year'):
+                    if(len(getattr(self, 'entry'+inputfield).get()) == 0):
+                        boolInputs = False
+            if(boolInputs):
+                predictbutton["state"] = NORMAL
+            else:
+                predictbutton["state"] = DISABLED
+
+        def checkColumnNames(checklist, csv_columns):
             for element in checklist:
                 if element not in csv_columns:
+                    print("Kolommen kloppen niet")
                     return False
+            print("Kolommen kloppen")
             return True
 
-        def CheckRows(selected_file):
+        def checkRows(selected_file):
             num_rows = -1
             for row in open(selected_file):
                 num_rows += 1
@@ -286,12 +299,8 @@ class Mainscreen(ttk.Frame):
                 # elk woord in de lijst zetten naar HOOFDLETTERS
                 list_of_column_names = [each_string.lower() for each_string in list_of_column_names]
                 #functie aanroepen
-                boolColumns = CheckColumnNames(check_list, list_of_column_names)
-                if(boolColumns):
-                    print("Kolommen kloppen")
-                else:
-                    print("Kolommen kloppen niet")
-                boolRows = CheckRows(csv_data)
+                boolColumns = checkColumnNames(check_list, list_of_column_names)
+                boolRows = checkRows(csv_data)
                 return boolColumns, boolRows
             except:
                 tk.messagebox.showerror("Error", "Wrong file or file format!")
@@ -304,12 +313,10 @@ class Mainscreen(ttk.Frame):
                 boolColumns, boolRows = load_Data(tv1,filename)
                 inputfields = ['year','wp6','wp7','wp8','wp9','wp10','wp11','wp12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','avghumidity','precipitation']
                 if ((boolColumns == False) or (boolRows == False)):
-                    predictbutton["state"] = DISABLED
                     for inputfield in inputfields:
                         getattr(self, 'entry'+inputfield)["state"] = DISABLED
                     uploadbutton.configure(bg="red")
                 if ((boolColumns == True) and (boolRows == True)):
-                    predictbutton["state"] = NORMAL
                     for inputfield in inputfields:
                         getattr(self, 'entry'+inputfield)["state"] = NORMAL
                     uploadbutton.configure(bg="green")

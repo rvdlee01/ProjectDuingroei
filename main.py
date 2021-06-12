@@ -25,6 +25,9 @@ from sklearn.model_selection import train_test_split
 filename =''
 backgroundcolor="floral white"
 labelfont = ('calibre',10, 'bold')
+xcolumnnames = ['windkracht6','windkracht7','windkracht8','windkracht9','windkracht10','windkracht11','windkracht12','noord','oost','zuid','west','noord-oosten','zuid-oosten','zuid-westen','noord-westen','hogeluchtvochtigheid',
+                'lageluchtvochtigheid','gemiddeldeluchtvochtigheid','neerslag']
+ycolumnname = 'duinhoogte'
 
 def detect_outlier(data):
     outliers = []
@@ -43,10 +46,10 @@ def model_NN(filename,inputX):
     df = df[df['jaar'] > 2002] #TEMP
 
     df['YYYYMMDD'] = df['jaar']
-    x = df[['windkracht6','windkracht7','windkracht8','windkracht9','windkracht10','windkracht11','windkracht12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','aveghumidity','neerslag']]
-    y = df['duinhoogte'].values
+    x = df[xcolumnnames]
+    y = df[ycolumnname].values
 
-    x_userinput = inputX[['windkracht6','windkracht7','windkracht8','windkracht9','windkracht10','windkracht11','windkracht12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','aveghumidity','neerslag']]
+    x_userinput = inputX[xcolumnnames]
     
     #Standardize data
     scaler = StandardScaler()
@@ -351,7 +354,7 @@ class Mainscreen(ttk.Frame):
 
                 # list with column names of user
                 list_of_column_names = list(df.columns)
-                check_list = ['jaar','duinhoogte','windkracht6','windkracht7','windkracht8','windkracht9','windkracht10','windkracht11','windkracht12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','aveghumidity','neerslag']
+                check_list = ['jaar', ycolumnname] + xcolumnnames
                 # make list of column names case insensitive
                 list_of_column_names = [each_string.lower() for each_string in list_of_column_names]
                 boolColumns = checkColumnNames(check_list, list_of_column_names)
@@ -386,7 +389,7 @@ def clearGraphpage(canvas):
 
 def plotGraph(a,f,canvas,startpage,tv2,csvTable2):
     start_page = startpage
-    inputX = pd.DataFrame(columns=['jaar','windkracht6','windkracht7','windkracht8','windkracht9','windkracht10','windkracht11','windkracht12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','aveghumidity','neerslag'])
+    inputX = pd.DataFrame(columns=['jaar']+xcolumnnames)
     inputX.loc[0] = [start_page.year.get(),start_page.wp6.get(),start_page.wp7.get(),start_page.wp8.get(),start_page.wp9.get(),start_page.wp10.get(),start_page.wp11.get(),start_page.wp12.get(),start_page.north.get(),start_page.east.get(),
                 start_page.south.get(),start_page.west.get(),start_page.northeast.get(),start_page.southeast.get(),start_page.southwest.get(),start_page.northwest.get(),start_page.highhumidity.get(),start_page.lowhumidity.get()
                 ,start_page.avghumidity.get(),start_page.precipitation.get()]

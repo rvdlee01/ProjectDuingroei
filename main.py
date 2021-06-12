@@ -45,7 +45,6 @@ def model_NN(filename,inputX):
     df = pd.read_csv(filename)
     df = df[df['jaar'] > 2002] #TEMP
 
-    df['YYYYMMDD'] = df['jaar']
     x = df[xcolumnnames]
     y = df[ycolumnname].values
 
@@ -64,7 +63,7 @@ def model_NN(filename,inputX):
     #predictions 
     datasetPredict = model.predict(x_dataset)
     inputPredict = model.predict(x_userinput) 
-    years = df['YYYYMMDD'].tolist()
+    years = df['jaar'].tolist()
     
     #convert np arrays to list and add the training and testing results together in a list
     listOfDataset = datasetPredict.tolist()
@@ -79,7 +78,7 @@ def dataframeToCSV(y_dataset, listOfDataset, listOfInput, df, scaler, years, inp
     differences = []
     errorrates = []
     count = 0
-    for date in df['YYYYMMDD']:
+    for date in df['jaar']:
         predictedList.append(int(float(scaler.inverse_transform(listOfDataset[count]))))
         actualList.append(int(float(scaler.inverse_transform(y_dataset[count]))))
         differences.append(int(float(scaler.inverse_transform(listOfDataset[count]))) - int(float(scaler.inverse_transform(y_dataset[count]))))

@@ -141,6 +141,31 @@ class Mainscreen(ttk.Frame):
         uploadbutton = Button(second_frame, text="CSV bestand selecteren", width=18,
                             command=lambda: getCsvFile(uploadbutton, predictbutton, tv1))
         uploadbutton.grid(row=0,column=1,padx=10,pady=15)
+
+        #Close help page window
+        def on_closing():
+            self.helppage.destroy()
+            self.helppageactived = False
+
+        #Create help page window
+        def helppage(root):
+            if self.helppageactived == False:
+                helpWindow = Toplevel(root)
+                helpWindow.title("Hulppagina")
+                helpWindow.geometry("700x600")
+                Label(helpWindow,text ="Tekst voor hulppagina komt hier.").pack()
+                self.helppageactived = True
+                self.helppage = helpWindow
+                helpWindow.protocol("WM_DELETE_WINDOW", on_closing)
+            else:
+                #flash window and activate bell sound if help page is already opened
+                self.helppage.focus_force()
+                self.helppage.bell()
+
+        self.helppageactived = False
+        self.helppage = None
+        helpbutton = Button(second_frame, text ="Hulp nodig?", command = lambda: [helppage(container)])
+        helpbutton.grid(row=0,column=3,padx=10,pady=15)
         
         listOfInputVariables = ['year','wp6','wp7','wp8','wp9','wp10','wp11','wp12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','avghumidity','precipitation']
         dictOfDirections = {'north':'noorden','east':'oosten','south':'zuiden','west':'westen','northeast':'noord-oosten','southeast':'zuid-oosten','southwest':'zuid-westen','northwest':'noord-westen'}

@@ -304,16 +304,14 @@ class Mainscreen(ttk.Frame):
                     messagebox.showerror("Error", "Upload eerst een CSV bestand en vul vervolgens alle velden in!")
                 elif(boolInputs == False):
                     messagebox.showerror("Error", "Vul eerst alle velden in!")
-                elif(sumOfWP != sumOfDirections or sumOfWP != sumOfHumidity): #moet naar elif veranderd worden voor total days check
+                elif(sumOfWP != sumOfDirections or sumOfWP != sumOfHumidity):
                     messagebox.showerror("Error", "De totaal aantal dagen komen niet met elkaar overeen!\nTotaal aantal dagen bij windkrachten: " + str(sumOfWP)
                                          + "\nTotaal aantal dagen bij windrichtingen: " + str(sumOfDirections) + "\nTotaal aantal dagen bij luchtvochtigheid: " + str(sumOfHumidity))
 
         def checkColumnNames(checklist, csv_columns):
             for element in checklist:
                 if element not in csv_columns:
-                    print("Kolommen kloppen niet")
                     return False
-            #print("Kolommen kloppen")
             return True
 
         def checkRows(selected_file):
@@ -321,41 +319,33 @@ class Mainscreen(ttk.Frame):
             for row in open(selected_file):
                 num_rows += 1
             if(num_rows > 10):
-                #print("Correct aantal rows")
                 return True
             else:
-                print("Te weinig rows")
                 return False
 
         def checkValues(df):
             hasEmptyValues = df.isnull().values.any()
             if(hasEmptyValues):
-                print("De geüploadde CSV bestand ontbreekt gegevens")
                 return False
             else:
-                #print("De geüploadde CSV bestand ontbreekt geen gegevens")
                 return True
 
         def checkYear(df):
             df = df.sort_values(by=['jaar'])
             start = df['jaar'].iloc[0]
             end = df['jaar'].iloc[-1]
-            message = ""
-            for i in range(start,end+1,1):
-                if i not in list(df.jaar):
-                    message += " {}".format(i)
-            if message == "":
-                return True,message
+            missingyears = "Het bestand bevat de volgende ontbrekende jaren:"
+            for year in range(start,end+1,1):
+                if year not in list(df.jaar):
+                    missingyears += " {}".format(year)
+            if missingyears == "":
+                return True,missingyears
             else:
-                return False,message
+                return False,missingyears
                     
         def load_Data(tv1,csv_data):
             try:
                 df = pd.read_csv(csv_data)
-
-                boolYear,message = checkYear(df)
-                if (boolYear):
-                    df = df.sort_values(by=['jaar'])
                 #clear treeview
                 for row in tv1.get_children():
                     tv1.delete(row)
@@ -375,10 +365,16 @@ class Mainscreen(ttk.Frame):
                 boolColumns = checkColumnNames(check_list, list_of_column_names)
                 boolRows = checkRows(csv_data)
                 boolValues = checkValues(df)
+                if 'jaar' in df:
+                    boolYear,missingyears = checkYear(df)
+                    if (boolYear):
+                        df = df.sort_values(by=['jaar'])
+                else:
+                    boolYear,missingyears = False, "Kolomnamen moeten overeenkomen met de vereiste kolomnamen voordat de 'jaar' kolom gecheckt kan worden!"
                 #detect outliers
                 #outliers = detect_outlier(df['duinhoogte'])
                 #print('outliers: ', outliers)
-                return boolColumns, boolRows, boolValues, boolYear, message
+                return boolColumns, boolRows, boolValues, boolYear, missingyears
             except:
                 tk.messagebox.showerror("Error", "Ongeldig bestand")
             return None
@@ -387,23 +383,22 @@ class Mainscreen(ttk.Frame):
             global filename
             filename = filedialog.askopenfilename(initialdir = "/",title = "Select file",filetypes = [("CSV files", '.csv')])
             if filename != '':
-                boolColumns, boolRows, boolValues, boolYear, message = load_Data(tv1,filename)
-                if boolYear == False:
-                    messagebox.showerror("Error", "Het bestand bevat de volgende ontbrekende jaren:"+message)
-                    return
-                if ((boolColumns == False) or (boolRows == False) or (boolValues == False)):
+                boolColumns, boolRows, boolValues, boolYear, missingyears = load_Data(tv1,filename)
+                if ((boolColumns == False) or (boolRows == False) or (boolValues == False) or (boolYear == False)):
                     for inputfield in listOfInputVariables:
                         getattr(self, 'entry'+inputfield)["state"] = DISABLED
                     uploadbutton.configure(bg="red")
                     csvErrorMessage = ""
                     if(boolColumns == False):
-                        csvErrorMessage += "Kolommen kloppen niet!\n"
+                        csvErrorMessage += "Kolomnamen komen niet overeen met de vereiste kolomnamen!\n"
                     if(boolRows == False):
-                        csvErrorMessage += "Te weinig rows!\n"
+                        csvErrorMessage += "Te weinig rijen!\n"
                     if(boolValues == False):
-                        csvErrorMessage += "Er ontbreken gegevens!"
+                        csvErrorMessage += "Er ontbreken gegevens!\n"
+                    if(boolYear == False):
+                        csvErrorMessage += missingyears
                     messagebox.showerror("Error", csvErrorMessage)
-                if ((boolColumns == True) and (boolRows == True) and (boolValues == True)):
+                if ((boolColumns == True) and (boolRows == True) and (boolValues == True) and (boolYear == True)):
                     for inputfield in listOfInputVariables:
                         getattr(self, 'entry'+inputfield)["state"] = NORMAL
                     uploadbutton.configure(bg="green")

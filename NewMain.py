@@ -164,23 +164,55 @@ class Mainscreen(ttk.Frame):
         helpbutton.grid(row=0,column=3,padx=10,pady=15)
         
         listOfInputVariables = ['year','wp6','wp7','wp8','wp9','wp10','wp11','wp12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','avghumidity','precipitation']
+        listOfWP = ['wp6','wp7','wp8','wp9','wp10','wp11','wp12']
         dictOfDirections = {'north':'noorden','east':'oosten','south':'zuiden','west':'westen','northeast':'noord-oosten','southeast':'zuid-oosten','southwest':'zuid-westen','northwest':'noord-westen'}
         dictOfHumidity = {'highhumidity': 'hoge luchtvochtigheid','lowhumidity':'lage luchtvochtigheid','avghumidity': 'gemiddelde luchtvochtigheid'}
         count = 6
 
+        def countData(listData,var):
+            sumData = 0
+            copyList = listData.copy()
+            if type(copyList) is list:
+                copyList.remove(var)
+            else:
+                del copyList[var]
+            for value in copyList:
+                if getattr(self,value).get() != '':
+                    sumData += int(getattr(self,value).get())
+            return sumData
+
         # Validates if input is an integer
         def validateInput(var,P):
+            total = 0
+            if 'wp' in var:
+                total = countData(listOfWP,var)
+            if var in dictOfDirections.keys():
+                total = countData(list(dictOfDirections.keys()),var)
+            if var in dictOfHumidity.keys():
+                total = countData(list(dictOfHumidity.keys()),var)
+            if P != '' and var != 'precipitation':
+                sumTotal = int(P) + total
+                
             if (var == 'precipitation'):
                 try:
                     P == '' or float(P) >= 0
                     return True
                 except:
                     messagebox.showerror("Error", "Vul een geldig numerieke waarde in")
-                    return checkInputs(False)
-            elif (str.isdigit(P) and (int(P) <= 365 and int(P) >= 0)) or P == '':
+                    return False
+            elif (str.isdigit(P) and (sumTotal <= 365 and sumTotal >= 0)) or P == '':
                 return True
             else:
-                messagebox.showerror("Error", "Vul een geldig numerieke waarde in.\nDe maximale waarde is 365.\nDe minimale waarde is 0.")
+                if 'wp' in var:
+                    message = "De maximale waarde van alle windkracht velden is 365."
+                elif var in dictOfDirections.keys():
+                    message = "De maximale waarde van alle windrichting velden is 365."
+                elif var in dictOfHumidity.keys():
+                    message = "De maximale waarde van alle luchtvochtigheidsvelden is 365."                
+                else:
+                    message = "Vul een geldig numerieke waarde in.\nDe maximale waarde is 365.\nDe minimale waarde is 0."
+                messagebox.showerror("Error", message)
+
                 return False
             
         vcmd = self.register(validateInput)
@@ -246,9 +278,8 @@ class Mainscreen(ttk.Frame):
         treescrolly.pack(side="right", fill="y")
 
         def checkInputs():
-            inputfields = ['year','wp6','wp7','wp8','wp9','wp10','wp11','wp12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','avghumidity','precipitation']
             boolInputs = True
-            for inputfield in inputfields:
+            for inputfield in listOfInputVariables:
                 if(inputfield != 'year'):
                     if(len(getattr(self, 'entry'+inputfield).get()) == 0):
                         boolInputs = False

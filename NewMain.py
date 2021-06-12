@@ -22,24 +22,25 @@ from keras.layers import Dense
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 
-LARGE_FONT = ("Verdana", 12)
 filename =''
+backgroundcolor="floral white"
+labelfont = ('calibre',10, 'bold')
 
 def detect_outlier(data):
-    outliers=[]
-    threshold=3
+    outliers = []
+    threshold = 3
     mean = np.mean(data)
-    std =np.std(data)
+    std = np.std(data)
     
     for y in data:
-        z_score= (y - mean)/std 
+        z_score = (y - mean)/std 
         if np.abs(z_score) > threshold:
             outliers.append(y)
     return outliers
 
 def model_NN(filename,inputX):
     df = pd.read_csv(filename)
-    df=df[df['year'] > 2002] #TEMP
+    df = df[df['year'] > 2002] #TEMP
 
     df['YYYYMMDD'] = df['year']
     x = df[['windkracht6','windkracht7','windkracht8','windkracht9','windkracht10','windkracht11','windkracht12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','aveghumidity','neerslag']]
@@ -130,14 +131,14 @@ class Mainscreen(ttk.Frame):
                 )
             )
 
-        second_frame = Frame(my_canvas, bg='blue')
+        second_frame = Frame(my_canvas, bg=backgroundcolor)
 
         my_canvas.create_window((0,0), window=second_frame, anchor = "nw")
 
-        predictbutton = Button(second_frame,state = DISABLED, text="Voorspellen", width=18,
+        predictbutton = Button(second_frame,state = DISABLED, text="Voorspellen", width=18, bg="snow",
                             command=lambda: [my_canvas.pack_forget(), GraphPage(container, self),my_scrollbar.pack_forget(),main_frame.pack_forget()])
         predictbutton.grid(row=0,column=2,padx=10,pady=15)
-        uploadbutton = Button(second_frame, text="CSV bestand selecteren", width=18,
+        uploadbutton = Button(second_frame, text="CSV bestand selecteren", width=18, bg="snow",
                             command=lambda: getCsvFile(uploadbutton, predictbutton, tv1))
         uploadbutton.grid(row=0,column=1,padx=10,pady=15)
 
@@ -163,7 +164,7 @@ class Mainscreen(ttk.Frame):
 
         self.helppageactived = False
         self.helppage = None
-        helpbutton = Button(second_frame, text ="Hulp nodig?", command = lambda: [helppage(container)])
+        helpbutton = Button(second_frame, text ="Hulp nodig?", bg="snow", command = lambda: [helppage(container)])
         helpbutton.grid(row=0,column=3,padx=10,pady=15)
         
         listOfInputVariables = ['year','wp6','wp7','wp8','wp9','wp10','wp11','wp12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','avghumidity','precipitation']
@@ -173,6 +174,7 @@ class Mainscreen(ttk.Frame):
 
         # Validates if input is an integer
         def validateInput(var,P):
+            checkInputs()
             if (var == 'precipitation'):
                 try:
                     P == '' or float(P) >= 0
@@ -195,10 +197,10 @@ class Mainscreen(ttk.Frame):
             setattr(self,value,StringVar())
             if value == 'year':
                 # Year entry box and label
-                setattr(self,value+'_label',Label(second_frame, text = 'Jaar', font=('calibre',10, 'bold')).grid(padx=30,row=rownumber,column=0,sticky="ne"))
+                setattr(self,value+'_label',Label(second_frame, text = 'Jaar', font=labelfont, bg=backgroundcolor).grid(padx=30,row=rownumber,column=0,sticky="e"))
             elif 'wp' in value:
                 # Wind power entry boxes and labels
-                setattr(self,value+'_label',Label(second_frame, text = 'Aantal dagen met windkracht ' + str(count), font=('calibre',10, 'bold')).grid(padx=30,row=rownumber,column=0,sticky="ne"))
+                setattr(self,value+'_label',Label(second_frame, text = 'Aantal dagen met windkracht ' + str(count), font=labelfont, bg=backgroundcolor).grid(padx=30,row=rownumber,column=0,sticky="e"))
                 count += 1
                 columnnumber = 1
             elif value in dictOfDirections.keys():
@@ -206,28 +208,28 @@ class Mainscreen(ttk.Frame):
                 for k, v in dictOfDirections.items():
                     if k == value:
                         textInputWD = 'Aantal dagen met wind vanuit het ' + v
-                setattr(self,value+'_label',Label(second_frame, text = textInputWD, font=('calibre',10, 'bold')).grid(padx=30,row=rownumber,column=2,sticky="ne"))
+                setattr(self,value+'_label',Label(second_frame, text = textInputWD, font=labelfont, bg=backgroundcolor).grid(padx=30,row=rownumber,column=2,sticky="e"))
                 columnnumber = 3
             elif value in dictOfHumidity.keys():
                 # Humidity entry boxes and labels
                 for k, v in dictOfHumidity.items():
                     if k == value:
                         textInputH = 'Aantal dagen met een ' + v
-                setattr(self,value+'_label',Label(second_frame, text = textInputH, font=('calibre',10, 'bold')).grid(padx=30,row=rownumber,column=4,sticky="ne"))
+                setattr(self,value+'_label',Label(second_frame, text = textInputH, font=labelfont, bg=backgroundcolor).grid(padx=30,row=rownumber,column=4,sticky="e"))
                 columnnumber = 5
             elif value == 'precipitation':
                 # Precipitation entry box and label
-                setattr(self,value+'_label',Label(second_frame, text = 'Neerslag in een jaar', font=('calibre',10, 'bold')).grid(padx=30,row=rownumber,column=4,sticky="ne"))
+                setattr(self,value+'_label',Label(second_frame, text = 'Neerslag in een jaar', font=labelfont, bg=backgroundcolor).grid(padx=30,row=rownumber,column=4,sticky="e"))
                 columnnumber = 5
             if value != 'year':
                 inputfield = Entry(second_frame, textvariable = getattr(self,value),validate='key', validatecommand=(vcmd,value,'%P'), state=DISABLED)
-                inputfield.grid(row=rownumber,column=columnnumber,sticky="nw")
+                inputfield.grid(row=rownumber,column=columnnumber,pady=5,sticky="w")
                 setattr(self,'entry'+value,inputfield)
             else:
                 self.defaultSelect = StringVar(second_frame)
                 self.defaultSelect.set(2021) # default value
                 selectbox = OptionMenu(second_frame, self.defaultSelect, 2021)
-                selectbox.grid(ipadx=30,row=rownumber, column=1,sticky="nw")
+                selectbox.grid(ipadx=30,row=rownumber, column=1,sticky="w")
                 selectbox['state'] = DISABLED
                 setattr(self,'entry'+value,selectbox)
             rownumber += 1
@@ -235,7 +237,7 @@ class Mainscreen(ttk.Frame):
                 rownumber = 2
         
         # Frame for Treeview
-        csvTable = LabelFrame(second_frame,text ="CSV data")
+        csvTable = LabelFrame(second_frame,text ="CSV data", bg=backgroundcolor)
         csvTable.grid(padx=30,pady=25,ipadx=400,ipady=250,row=41,columnspan=6)
 
         # Treeview Widget
@@ -389,7 +391,7 @@ class GraphPage(ttk.Frame):
                 )
             )
 
-        second_frame = Frame(my_canvas)
+        second_frame = Frame(my_canvas, bg=backgroundcolor)
 
         my_canvas.create_window((0,0), window=second_frame, anchor="nw")
 

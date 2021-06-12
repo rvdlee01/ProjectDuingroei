@@ -41,7 +41,7 @@ def detect_outlier(data):
 
 def model_NN(filename,inputX):
     df = pd.read_csv(filename)
-    df=df[df['year'] > 2002]
+    df=df[df['year'] > 2002] #TEMP
 
     df['YYYYMMDD'] = df['year']
     x = df[['windkracht6','windkracht7','windkracht8','windkracht9','windkracht10','windkracht11','windkracht12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','aveghumidity','neerslag']]
@@ -66,36 +66,46 @@ def model_NN(filename,inputX):
     #predictions 
     datasetPredict = model.predict(x_dataset)
     inputPredict = model.predict(x_userinput) 
-    years = df['YYYYMMDD'].tolist()
+    years = []
+    yearsList = df['YYYYMMDD'].tolist()
+    shuffledYearsList = []
     
     #convert np arrays to list and add the training and testing results together in a list
     listOfDataset = datasetPredict.tolist()
     listOfInput = inputPredict.tolist()
 
-    OutputDataframe = dataframeToCSV(y_dataset, listOfDataset, listOfInput, df, scaler, years, inputX)
+    OutputDataframe = dataframeToCSV(y_dataset, listOfDataset, listOfInput, df, scaler, years, inputX, yearsList,inputPredict, shuffledYearsList)
     return df, scaler.inverse_transform(y_dataset), scaler.inverse_transform(listOfDataset), scaler.inverse_transform(inputPredict), years, OutputDataframe
 
-def dataframeToCSV(y_dataset, listOfDataset, listOfInput, df, scaler, years, inputX):
+def dataframeToCSV(y_dataset, listOfDataset, listOfInput, df, scaler, years, inputX, yearsList,inputPredict, shuffledYearsList):
     predictedList = []
     actualList = []
+    actualListUpdated = []
     differences = []
     errorrates = []
     count = 0
     for date in df['YYYYMMDD']:
         predictedList.append(int(float(scaler.inverse_transform(listOfDataset[count]))))
         actualList.append(int(float(scaler.inverse_transform(y_dataset[count]))))
+        actualListUpdated.append(int(float(scaler.inverse_transform(y_dataset[count]))))
         differences.append(int(float(scaler.inverse_transform(listOfDataset[count]))) - int(float(scaler.inverse_transform(y_dataset[count]))))
         errorrates.append((int(float(scaler.inverse_transform(listOfDataset[count]))) - int(float(scaler.inverse_transform(y_dataset[count]))))
                             / int(float(scaler.inverse_transform(y_dataset[count]))) * 100)
+        shuffledYearsList.append("YYYY")
+        years.append(count)
         count = count + 1
     #add prediction of userinput to the lists
     predictedList.append(int(float(scaler.inverse_transform(listOfInput[0]))))
-    actualList.append(None)
+    actualList.append(None) #None
+    actualListUpdated.append(int(scaler.inverse_transform(y_dataset)[-1]+(scaler.inverse_transform(inputPredict)[0] - scaler.inverse_transform(listOfDataset)[-1])))
     differences.append(None)
     errorrates.append(None)
-    years.append(int(inputX['year'].values))
+    years.append(count + 1)
+    yearsList.append(int(inputX['year'].values))
+    shuffledYearsList.append(int(inputX['year'].values))
     #assign list to column
-    newDataframe = {'Date': years, 'Predicted': predictedList, 'Actual': actualList, 'Difference': differences, 'Error rate': errorrates}
+    #newDataframe = {'Jaar': yearsList, 'Voorspelling': predictedList, 'Daadwerkelijk': actualList, 'Verschil': differences, 'Foutpercentage': errorrates}
+    newDataframe = {'Jaar': yearsList, 'Duinhoogte': actualListUpdated, 'Jaar van voorspelling': shuffledYearsList, 'Voorspelling': predictedList, 'Daadwerkelijk': actualList, 'Verschil': differences, 'Foutpercentage': errorrates}
     #create dataframe
     OutputDataframe = pd.DataFrame(newDataframe)
     print(OutputDataframe)
@@ -109,7 +119,6 @@ def convertToList(arrayX, arrayY):
         x.append(xas)
     return x, y
 
-
 class Mainscreen(ttk.Frame):
     def __init__(self, container, *args, **kwargs):
         super().__init__(container, *args, **kwargs)
@@ -119,10 +128,7 @@ class Mainscreen(ttk.Frame):
         my_canvas = Canvas(main_frame)
         my_canvas.pack(side=LEFT, fill=BOTH, expand=1)
 
-        def OnMouseWheel(event):
-            my_canvas.yview_scroll(int(-1*(event.delta/120)), "units")
-
-        my_canvas.bind_all("<MouseWheel>",OnMouseWheel)
+        my_canvas.bind_all("<MouseWheel>",lambda event: my_canvas.yview_scroll(int(-1*(event.delta/120)), "units"))
 
         my_scrollbar = ttk.Scrollbar(main_frame, orient=VERTICAL, command=my_canvas.yview)
         my_scrollbar.pack(side=RIGHT, fill=Y)
@@ -136,16 +142,18 @@ class Mainscreen(ttk.Frame):
                 )
             )
 
-        second_frame = Frame(my_canvas)
+        second_frame = Frame(my_canvas, bg='blue')
 
-        my_canvas.create_window((0,0), window=second_frame, anchor="nw")
+        #x0 = my_canvas.winfo_screenwidth()/2
+        #y0 = my_canvas.winfo_screenheight()/2
+        my_canvas.create_window((0,0), window=second_frame, anchor = "center")
 
         predictbutton = Button(second_frame,state = DISABLED, text="Voorspellen", width=18,
                             command=lambda: [my_canvas.pack_forget(), GraphPage(container, self),my_scrollbar.pack_forget(),main_frame.pack_forget()])
-        predictbutton.grid(row=0,column=1,padx=10,pady=10)
+        predictbutton.grid(row=0,column=2,padx=10,pady=15)
         uploadbutton = Button(second_frame, text="CSV bestand selecteren", width=18,
                             command=lambda: getCsvFile(uploadbutton, predictbutton, tv1))
-        uploadbutton.grid(row=1,column=1,padx=10,pady=10)
+        uploadbutton.grid(row=0,column=1,padx=10,pady=15)
         
         listOfInputVariables = ['year','wp6','wp7','wp8','wp9','wp10','wp11','wp12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','avghumidity','precipitation']
         dictOfDirections = {'north':'noorden','east':'oosten','south':'zuiden','west':'westen','northeast':'noord-oosten','southeast':'zuid-oosten','southwest':'zuid-westen','northwest':'noord-westen'}
@@ -154,45 +162,62 @@ class Mainscreen(ttk.Frame):
 
         # Validates if input is an integer
         def validateInput(P):
-            if str.isdigit(P):
+            if str.isdigit(P) and (int(P) <= 365) or P == '':
                 return True
             else:
                 return False
             
         vcmd = (self.register(validateInput))
 
+        rownumber = 2
+        
         for value in listOfInputVariables:
             # Variables for storing data to predict dune height
             setattr(self,value,StringVar())
             if value == 'year':
                 # Year entry box and label
-                setattr(self,value+'_label',Label(second_frame, text = 'Jaar', font=('calibre',10, 'bold')).grid(padx=30,column=1,sticky="ne"))
+                setattr(self,value+'_label',Label(second_frame, text = 'Jaar', font=('calibre',10, 'bold')).grid(padx=30,row=rownumber,column=0,sticky="ne"))
             elif 'wp' in value:
                 # Wind power entry boxes and labels
-                setattr(self,value+'_label',Label(second_frame, text = 'Aantal dagen met windkracht ' + str(count), font=('calibre',10, 'bold')).grid(padx=30,column=1,sticky="ne"))
+                setattr(self,value+'_label',Label(second_frame, text = 'Aantal dagen met windkracht ' + str(count), font=('calibre',10, 'bold')).grid(padx=30,row=rownumber,column=0,sticky="ne"))
                 count += 1
+                columnnumber = 1
             elif value in dictOfDirections.keys():
                 # Wind direction entry boxes and labels
                 for k, v in dictOfDirections.items():
                     if k == value:
                         textInputWD = 'Aantal dagen met wind vanuit het ' + v
-                setattr(self,value+'_label',Label(second_frame, text = textInputWD, font=('calibre',10, 'bold')).grid(padx=30,column=1,sticky="ne"))
+                setattr(self,value+'_label',Label(second_frame, text = textInputWD, font=('calibre',10, 'bold')).grid(padx=30,row=rownumber,column=2,sticky="ne"))
+                columnnumber = 3
             elif value in dictOfHumidity.keys():
                 # Humidity entry boxes and labels
                 for k, v in dictOfHumidity.items():
                     if k == value:
                         textInputH = 'Aantal dagen met een ' + v
-                setattr(self,value+'_label',Label(second_frame, text = textInputH, font=('calibre',10, 'bold')).grid(padx=30,column=1,sticky="ne"))
+                setattr(self,value+'_label',Label(second_frame, text = textInputH, font=('calibre',10, 'bold')).grid(padx=30,row=rownumber,column=4,sticky="ne"))
+                columnnumber = 5
             elif value == 'precipitation':
                 # Precipitation entry box and label
-                setattr(self,value+'_label',Label(second_frame, text = 'Neerslag in een jaar', font=('calibre',10, 'bold')).grid(padx=30,column=1,sticky="ne"))
-            inputfield = Entry(second_frame, width=25, textvariable = getattr(self,value),validate='all', validatecommand=(vcmd,'%S'), state=DISABLED)
-            inputfield.grid(padx=30,column=1,sticky="ne")
-            setattr(self,'entry'+value,inputfield)
+                setattr(self,value+'_label',Label(second_frame, text = 'Neerslag in een jaar', font=('calibre',10, 'bold')).grid(padx=30,row=rownumber,column=4,sticky="ne"))
+                columnnumber = 5
+            if value != 'year':
+                inputfield = Entry(second_frame, textvariable = getattr(self,value),validate='all', validatecommand=(vcmd,'%P'), state=DISABLED)
+                inputfield.grid(row=rownumber,column=columnnumber,sticky="nw")
+                setattr(self,'entry'+value,inputfield)
+            else:
+                self.defaultSelect = StringVar(second_frame)
+                self.defaultSelect.set(2021) # default value
+                selectbox = OptionMenu(second_frame, self.defaultSelect, 2021)
+                selectbox.grid(ipadx=30,row=rownumber, column=1,sticky="nw")
+                selectbox['state'] = DISABLED
+                setattr(self,'entry'+value,selectbox)
+            rownumber += 1
+            if value == 'wp12' or value == 'northwest':
+                rownumber = 2
         
         # Frame for Treeview
         csvTable = LabelFrame(second_frame,text ="CSV data")
-        csvTable.grid(padx=30,pady=25,ipadx=400,ipady=250,row=41,column=1)
+        csvTable.grid(padx=30,pady=25,ipadx=400,ipady=250,row=41,columnspan=6)
 
         # Treeview Widget
         tv1 = ttk.Treeview(csvTable)
@@ -261,13 +286,11 @@ class Mainscreen(ttk.Frame):
                 if ((boolColumns == False) or (boolRows == False)):
                     predictbutton["state"] = DISABLED
                     for inputfield in inputfields:
-                        v = getattr(self, 'entry'+inputfield)
                         getattr(self, 'entry'+inputfield)["state"] = DISABLED
                     uploadbutton.configure(bg="red")
                 if ((boolColumns == True) and (boolRows == True)):
                     predictbutton["state"] = NORMAL
                     for inputfield in inputfields:
-                        v = getattr(self, 'entry'+inputfield)
                         getattr(self, 'entry'+inputfield)["state"] = NORMAL
                     uploadbutton.configure(bg="green")
 
@@ -279,7 +302,7 @@ def clearGraphpage(canvas):
 def plotGraph(a,b,f,canvas,startpage,tv2,csvTable2):
     start_page = startpage
     inputX = pd.DataFrame(columns=['year','windkracht6','windkracht7','windkracht8','windkracht9','windkracht10','windkracht11','windkracht12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','aveghumidity','neerslag'])
-    inputX.loc[0] = [start_page.year.get(),start_page.wp6.get(),start_page.wp7.get(),start_page.wp8.get(),start_page.wp9.get(),start_page.wp10.get(),start_page.wp11.get(),start_page.wp12.get(),start_page.north.get(),start_page.east.get(),
+    inputX.loc[0] = [start_page.defaultSelect.get(),start_page.wp6.get(),start_page.wp7.get(),start_page.wp8.get(),start_page.wp9.get(),start_page.wp10.get(),start_page.wp11.get(),start_page.wp12.get(),start_page.north.get(),start_page.east.get(),
                 start_page.south.get(),start_page.west.get(),start_page.northeast.get(),start_page.southeast.get(),start_page.southwest.get(),start_page.northwest.get(),start_page.highhumidity.get(),start_page.lowhumidity.get()
                 ,start_page.avghumidity.get(),start_page.precipitation.get()]
             
@@ -332,6 +355,8 @@ class GraphPage(ttk.Frame):
         my_canvas = Canvas(plot_frame)
         my_canvas.pack(side=LEFT, fill=BOTH, expand=1)
 
+        my_canvas.bind_all("<MouseWheel>",lambda event: my_canvas.yview_scroll(int(-1*(event.delta/120)), "units"))
+
         my_scrollbar = ttk.Scrollbar(plot_frame, orient=VERTICAL, command=my_canvas.yview)
         my_scrollbar.pack(side=RIGHT, fill=Y)
 
@@ -383,7 +408,7 @@ class GraphPage(ttk.Frame):
             
 def main():
     root = tk.Tk()
-    root.geometry('1200x800')
+    root.geometry('1400x800')
 
     Mainscreen(root)
     

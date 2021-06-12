@@ -149,9 +149,7 @@ class Mainscreen(ttk.Frame):
 
         # Validates if input is an integer
         def validateInput(var,P):
-            print(P)
-            print(getattr(self,var).get())
-            if (var == 'precipitation' and str.isdigit(P) and (float(P) >= 0)) or P == '':
+            if (var == 'precipitation' and (float(P) >= 0)) or P == '':
                 return True
             elif (str.isdigit(P) and (int(P) <= 365 and int(P) >= 0)) or P == '':
                 return True
@@ -192,7 +190,7 @@ class Mainscreen(ttk.Frame):
                 setattr(self,value+'_label',Label(second_frame, text = 'Neerslag in een jaar', font=('calibre',10, 'bold')).grid(padx=30,row=rownumber,column=4,sticky="ne"))
                 columnnumber = 5
             if value != 'year':
-                inputfield = Entry(second_frame, textvariable = getattr(self,value),validate='all', validatecommand=(vcmd,value,'%P'), state=DISABLED)
+                inputfield = Entry(second_frame, textvariable = getattr(self,value),validate='key', validatecommand=(vcmd,value,'%P'), state=DISABLED)
                 inputfield.grid(row=rownumber,column=columnnumber,sticky="nw")
                 setattr(self,'entry'+value,inputfield)
             else:

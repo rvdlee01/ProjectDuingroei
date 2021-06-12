@@ -313,7 +313,7 @@ class Mainscreen(ttk.Frame):
                 if element not in csv_columns:
                     print("Kolommen kloppen niet")
                     return False
-            print("Kolommen kloppen")
+            #print("Kolommen kloppen")
             return True
 
         def checkRows(selected_file):
@@ -321,7 +321,7 @@ class Mainscreen(ttk.Frame):
             for row in open(selected_file):
                 num_rows += 1
             if(num_rows > 10):
-                print("Correct aantal rows")
+                #print("Correct aantal rows")
                 return True
             else:
                 print("Te weinig rows")
@@ -333,7 +333,7 @@ class Mainscreen(ttk.Frame):
                 print("De geüploadde CSV bestand ontbreekt gegevens")
                 return False
             else:
-                print("De geüploadde CSV bestand ontbreekt geen gegevens")
+                #print("De geüploadde CSV bestand ontbreekt geen gegevens")
                 return True
 
         def load_Data(tv1,csv_data):
@@ -376,6 +376,14 @@ class Mainscreen(ttk.Frame):
                     for inputfield in listOfInputVariables:
                         getattr(self, 'entry'+inputfield)["state"] = DISABLED
                     uploadbutton.configure(bg="red")
+                    csvErrorMessage = ""
+                    if(boolColumns == False):
+                        csvErrorMessage += "Kolommen kloppen niet!\n"
+                    if(boolRows == False):
+                        csvErrorMessage += "Te weinig rows!\n"
+                    if(boolValues == False):
+                        csvErrorMessage += "Er ontbreken gegevens!"
+                    messagebox.showerror("Error", csvErrorMessage)
                 if ((boolColumns == True) and (boolRows == True) and (boolValues == True)):
                     for inputfield in listOfInputVariables:
                         getattr(self, 'entry'+inputfield)["state"] = NORMAL

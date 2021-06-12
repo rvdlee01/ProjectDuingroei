@@ -25,6 +25,8 @@ x_test = scaler.transform(x_test)
 
 y_train = scaler.fit_transform(np.array(y_train).reshape(-1,1))
 y_test = scaler.transform(np.array(y_test).reshape(-1,1))
+x = np.log(x)
+y = np.log(y)
 
 #Adding dense layers
 model = Sequential()

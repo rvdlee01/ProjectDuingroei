@@ -258,7 +258,8 @@ class Mainscreen(ttk.Frame):
             else:
                 setattr(self,value,StringVar(second_frame))
                 getattr(self,value).set(2021) # default value
-                selectbox = OptionMenu(second_frame, getattr(self,value), 2021)
+                options = (2021)
+                selectbox = OptionMenu(second_frame, getattr(self,value), *options)
                 selectbox.grid(ipadx=30,row=rownumber, column=1,sticky="w")
                 selectbox['state'] = DISABLED
                 setattr(self,'entry'+value,selectbox)

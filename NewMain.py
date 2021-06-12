@@ -190,7 +190,7 @@ class Mainscreen(ttk.Frame):
                 total = countData(list(dictOfDirections.keys()),var)
             if var in dictOfHumidity.keys():
                 total = countData(list(dictOfHumidity.keys()),var)
-            if P != '' and var != 'precipitation':
+            if P != '' and var != 'precipitation' and str.isdigit(P):
                 sumTotal = int(P) + total
                 
             if (var == 'precipitation'):
@@ -200,17 +200,17 @@ class Mainscreen(ttk.Frame):
                 except:
                     messagebox.showerror("Error", "Vul een geldig numerieke waarde in")
                     return False
-            elif (str.isdigit(P) and (sumTotal <= 365 and sumTotal >= 0)) or P == '':
+            if (str.isdigit(P) and (sumTotal <= 365 and sumTotal >= 0)) or P == '':
                 return True
             else:
-                if 'wp' in var:
+                if  str.isdigit(P) == False:         
+                    message = "Vul een geldig numerieke waarde in.\nDe maximale waarde is 365.\nDe minimale waarde is 0."
+                elif 'wp' in var:
                     message = "De maximale waarde van alle windkracht velden is 365."
                 elif var in dictOfDirections.keys():
                     message = "De maximale waarde van alle windrichting velden is 365."
                 elif var in dictOfHumidity.keys():
                     message = "De maximale waarde van alle luchtvochtigheidsvelden is 365."                
-                else:
-                    message = "Vul een geldig numerieke waarde in.\nDe maximale waarde is 365.\nDe minimale waarde is 0."
                 messagebox.showerror("Error", message)
 
                 return False

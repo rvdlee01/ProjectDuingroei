@@ -15,7 +15,7 @@ x = df[['windkracht6','windkracht7','windkracht8','windkracht9','windkracht10','
 y = df['punt1'].values
     
 #90% training data & 10% testing data
-x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.1, random_state=0) #shuffle=False/True
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.1, random_state=0, shuffle=False)
    
 #Standardize data
 scaler = StandardScaler()
@@ -28,14 +28,14 @@ y_test = scaler.transform(np.array(y_test).reshape(-1,1))
 
 #Adding dense layers
 model = Sequential()
-model.add(Dense(64, input_dim=19, activation='relu'))
-model.add(Dense(32, activation='relu'))
-model.add(Dense(16, activation='relu'))
-model.add(Dense(1, activation='relu')) #maybe sigmoid? max 3 layers!
+#model.add(Dense(64, input_dim=19, activation='relu'))
+model.add(Dense(16, input_dim=19, activation='relu'))
+model.add(Dense(8, activation='relu'))
+model.add(Dense(1, activation='linear')) #maybe sigmoid? max 3 layers!
 model.compile(loss='mse', optimizer='adam')
 
 #train model
-model.fit(x_train,y_train, epochs=10, batch_size=50, verbose=0) #shuffle=False/True
+model.fit(x_train,y_train, epochs=10, batch_size=50, verbose=0, shuffle=False)
 
 # save the model to disk
 model.save('model')

@@ -10,7 +10,6 @@ from tkinter import *
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
-
 from tkinter import font
 
 import numpy as np
@@ -22,34 +21,30 @@ from keras.models import Model
 from keras.layers import Dense
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import r2_score
 
-LARGE_FONT = ("Verdana", 12)
 filename =''
+backgroundcolor="floral white"
+labelfont = ('calibre',10, 'bold')
 
 def detect_outlier(data):
-    outliers=[]
-    threshold=3
+    outliers = []
+    threshold = 3
     mean = np.mean(data)
-    std =np.std(data)
+    std = np.std(data)
     
     for y in data:
-        z_score= (y - mean)/std 
+        z_score = (y - mean)/std 
         if np.abs(z_score) > threshold:
             outliers.append(y)
     return outliers
 
 def model_NN(filename,inputX):
     df = pd.read_csv(filename)
-    df=df[df['year'] > 2002] #TEMP
+    df = df[df['year'] > 2002] #TEMP
 
     df['YYYYMMDD'] = df['year']
     x = df[['windkracht6','windkracht7','windkracht8','windkracht9','windkracht10','windkracht11','windkracht12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','aveghumidity','neerslag']]
     y = df['punt1'].values
-
-    #detect outliers
-    outliers = detect_outlier(df['punt1'])
-    print('outliers: ', outliers)
 
     x_userinput = inputX[['windkracht6','windkracht7','windkracht8','windkracht9','windkracht10','windkracht11','windkracht12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','aveghumidity','neerslag']]
     
@@ -66,46 +61,36 @@ def model_NN(filename,inputX):
     #predictions 
     datasetPredict = model.predict(x_dataset)
     inputPredict = model.predict(x_userinput) 
-    years = []
-    yearsList = df['YYYYMMDD'].tolist()
-    shuffledYearsList = []
+    years = df['YYYYMMDD'].tolist()
     
     #convert np arrays to list and add the training and testing results together in a list
     listOfDataset = datasetPredict.tolist()
     listOfInput = inputPredict.tolist()
 
-    OutputDataframe = dataframeToCSV(y_dataset, listOfDataset, listOfInput, df, scaler, years, inputX, yearsList,inputPredict, shuffledYearsList)
+    OutputDataframe = dataframeToCSV(y_dataset, listOfDataset, listOfInput, df, scaler, years, inputX,inputPredict)
     return df, scaler.inverse_transform(y_dataset), scaler.inverse_transform(listOfDataset), scaler.inverse_transform(inputPredict), years, OutputDataframe
 
-def dataframeToCSV(y_dataset, listOfDataset, listOfInput, df, scaler, years, inputX, yearsList,inputPredict, shuffledYearsList):
+def dataframeToCSV(y_dataset, listOfDataset, listOfInput, df, scaler, years, inputX,inputPredict):
     predictedList = []
     actualList = []
-    actualListUpdated = []
     differences = []
     errorrates = []
     count = 0
     for date in df['YYYYMMDD']:
         predictedList.append(int(float(scaler.inverse_transform(listOfDataset[count]))))
         actualList.append(int(float(scaler.inverse_transform(y_dataset[count]))))
-        actualListUpdated.append(int(float(scaler.inverse_transform(y_dataset[count]))))
         differences.append(int(float(scaler.inverse_transform(listOfDataset[count]))) - int(float(scaler.inverse_transform(y_dataset[count]))))
         errorrates.append((int(float(scaler.inverse_transform(listOfDataset[count]))) - int(float(scaler.inverse_transform(y_dataset[count]))))
                             / int(float(scaler.inverse_transform(y_dataset[count]))) * 100)
-        shuffledYearsList.append("YYYY")
-        years.append(count)
         count = count + 1
     #add prediction of userinput to the lists
     predictedList.append(int(float(scaler.inverse_transform(listOfInput[0]))))
-    actualList.append(None) #None
-    actualListUpdated.append(int(scaler.inverse_transform(y_dataset)[-1]+(scaler.inverse_transform(inputPredict)[0] - scaler.inverse_transform(listOfDataset)[-1])))
+    actualList.append(None)
     differences.append(None)
     errorrates.append(None)
-    years.append(count + 1)
-    yearsList.append(int(inputX['year'].values))
-    shuffledYearsList.append(int(inputX['year'].values))
+    years.append(int(inputX['year'].values))
     #assign list to column
-    #newDataframe = {'Jaar': yearsList, 'Voorspelling': predictedList, 'Daadwerkelijk': actualList, 'Verschil': differences, 'Foutpercentage': errorrates}
-    newDataframe = {'Jaar': yearsList, 'Duinhoogte': actualListUpdated, 'Jaar van voorspelling': shuffledYearsList, 'Voorspelling': predictedList, 'Daadwerkelijk': actualList, 'Verschil': differences, 'Foutpercentage': errorrates}
+    newDataframe = {'Jaar': years,'Voorspelling': predictedList, 'Daadwerkelijk': actualList, 'Verschil': differences, 'Foutpercentage': errorrates}
     #create dataframe
     OutputDataframe = pd.DataFrame(newDataframe)
     print(OutputDataframe)
@@ -142,18 +127,41 @@ class Mainscreen(ttk.Frame):
                 )
             )
 
-        second_frame = Frame(my_canvas, bg='blue')
+        second_frame = Frame(my_canvas, bg=backgroundcolor)
 
-        #x0 = my_canvas.winfo_screenwidth()/2
-        #y0 = my_canvas.winfo_screenheight()/2
-        my_canvas.create_window((0,0), window=second_frame, anchor = "center")
+        my_canvas.create_window((0,0), window=second_frame, anchor = "nw")
 
-        predictbutton = Button(second_frame,state = DISABLED, text="Voorspellen", width=18,
-                            command=lambda: [my_canvas.pack_forget(), GraphPage(container, self),my_scrollbar.pack_forget(),main_frame.pack_forget()])
+        predictbutton = Button(second_frame, text="Voorspellen", width=18, bg="snow",
+                            command=lambda: checkInputs())
         predictbutton.grid(row=0,column=2,padx=10,pady=15)
-        uploadbutton = Button(second_frame, text="CSV bestand selecteren", width=18,
+        uploadbutton = Button(second_frame, text="CSV bestand selecteren", width=18, bg="snow",
                             command=lambda: getCsvFile(uploadbutton, predictbutton, tv1))
         uploadbutton.grid(row=0,column=1,padx=10,pady=15)
+
+        #Close help page window
+        def on_closing():
+            self.helppage.destroy()
+            self.helppageactived = False
+
+        #Create help page window
+        def helppage(root):
+            if self.helppageactived == False:
+                helpWindow = Toplevel(root)
+                helpWindow.title("Hulppagina")
+                helpWindow.geometry("700x600")
+                Label(helpWindow,text ="Tekst voor hulppagina komt hier.").pack()
+                self.helppageactived = True
+                self.helppage = helpWindow
+                helpWindow.protocol("WM_DELETE_WINDOW", on_closing)
+            else:
+                #flash window and activate bell sound if help page is already opened
+                self.helppage.focus_force()
+                self.helppage.bell()
+
+        self.helppageactived = False
+        self.helppage = None
+        helpbutton = Button(second_frame, text ="Hulp nodig?", bg="snow", command = lambda: [helppage(container)])
+        helpbutton.grid(row=0,column=3,padx=10,pady=15)
         
         listOfInputVariables = ['year','wp6','wp7','wp8','wp9','wp10','wp11','wp12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','avghumidity','precipitation']
         dictOfDirections = {'north':'noorden','east':'oosten','south':'zuiden','west':'westen','northeast':'noord-oosten','southeast':'zuid-oosten','southwest':'zuid-westen','northwest':'noord-westen'}
@@ -161,13 +169,21 @@ class Mainscreen(ttk.Frame):
         count = 6
 
         # Validates if input is an integer
-        def validateInput(P):
-            if str.isdigit(P) and (int(P) <= 365) or P == '':
+        def validateInput(var,P):
+            if (var == 'precipitation'):
+                try:
+                    P == '' or float(P) >= 0
+                    return True
+                except:
+                    messagebox.showerror("Error", "Vul een geldig numerieke waarde in")
+                    return checkInputs(False)
+            elif (str.isdigit(P) and (int(P) <= 365 and int(P) >= 0)) or P == '':
                 return True
             else:
+                messagebox.showerror("Error", "Vul een geldig numerieke waarde in.\nDe maximale waarde is 365.\nDe minimale waarde is 0.")
                 return False
             
-        vcmd = (self.register(validateInput))
+        vcmd = self.register(validateInput)
 
         rownumber = 2
         
@@ -176,10 +192,10 @@ class Mainscreen(ttk.Frame):
             setattr(self,value,StringVar())
             if value == 'year':
                 # Year entry box and label
-                setattr(self,value+'_label',Label(second_frame, text = 'Jaar', font=('calibre',10, 'bold')).grid(padx=30,row=rownumber,column=0,sticky="ne"))
+                setattr(self,value+'_label',Label(second_frame, text = 'Jaar', font=labelfont, bg=backgroundcolor).grid(padx=30,row=rownumber,column=0,sticky="e"))
             elif 'wp' in value:
                 # Wind power entry boxes and labels
-                setattr(self,value+'_label',Label(second_frame, text = 'Aantal dagen met windkracht ' + str(count), font=('calibre',10, 'bold')).grid(padx=30,row=rownumber,column=0,sticky="ne"))
+                setattr(self,value+'_label',Label(second_frame, text = 'Aantal dagen met windkracht ' + str(count), font=labelfont, bg=backgroundcolor).grid(padx=30,row=rownumber,column=0,sticky="e"))
                 count += 1
                 columnnumber = 1
             elif value in dictOfDirections.keys():
@@ -187,28 +203,28 @@ class Mainscreen(ttk.Frame):
                 for k, v in dictOfDirections.items():
                     if k == value:
                         textInputWD = 'Aantal dagen met wind vanuit het ' + v
-                setattr(self,value+'_label',Label(second_frame, text = textInputWD, font=('calibre',10, 'bold')).grid(padx=30,row=rownumber,column=2,sticky="ne"))
+                setattr(self,value+'_label',Label(second_frame, text = textInputWD, font=labelfont, bg=backgroundcolor).grid(padx=30,row=rownumber,column=2,sticky="e"))
                 columnnumber = 3
             elif value in dictOfHumidity.keys():
                 # Humidity entry boxes and labels
                 for k, v in dictOfHumidity.items():
                     if k == value:
                         textInputH = 'Aantal dagen met een ' + v
-                setattr(self,value+'_label',Label(second_frame, text = textInputH, font=('calibre',10, 'bold')).grid(padx=30,row=rownumber,column=4,sticky="ne"))
+                setattr(self,value+'_label',Label(second_frame, text = textInputH, font=labelfont, bg=backgroundcolor).grid(padx=30,row=rownumber,column=4,sticky="e"))
                 columnnumber = 5
             elif value == 'precipitation':
                 # Precipitation entry box and label
-                setattr(self,value+'_label',Label(second_frame, text = 'Neerslag in een jaar', font=('calibre',10, 'bold')).grid(padx=30,row=rownumber,column=4,sticky="ne"))
+                setattr(self,value+'_label',Label(second_frame, text = 'Neerslag in een jaar', font=labelfont, bg=backgroundcolor).grid(padx=30,row=rownumber,column=4,sticky="e"))
                 columnnumber = 5
             if value != 'year':
-                inputfield = Entry(second_frame, textvariable = getattr(self,value),validate='all', validatecommand=(vcmd,'%P'), state=DISABLED)
-                inputfield.grid(row=rownumber,column=columnnumber,sticky="nw")
+                inputfield = Entry(second_frame, textvariable = getattr(self,value),validate='key', validatecommand=(vcmd,value,'%P'), state=DISABLED)
+                inputfield.grid(row=rownumber,column=columnnumber,pady=5,sticky="w")
                 setattr(self,'entry'+value,inputfield)
             else:
                 self.defaultSelect = StringVar(second_frame)
                 self.defaultSelect.set(2021) # default value
                 selectbox = OptionMenu(second_frame, self.defaultSelect, 2021)
-                selectbox.grid(ipadx=30,row=rownumber, column=1,sticky="nw")
+                selectbox.grid(ipadx=30,row=rownumber, column=1,sticky="w")
                 selectbox['state'] = DISABLED
                 setattr(self,'entry'+value,selectbox)
             rownumber += 1
@@ -216,26 +232,44 @@ class Mainscreen(ttk.Frame):
                 rownumber = 2
         
         # Frame for Treeview
-        csvTable = LabelFrame(second_frame,text ="CSV data")
+        csvTable = LabelFrame(second_frame,text="CSV data", bg=backgroundcolor)
         csvTable.grid(padx=30,pady=25,ipadx=400,ipady=250,row=41,columnspan=6)
 
         # Treeview Widget
         tv1 = ttk.Treeview(csvTable)
         tv1.place(relheight=1, relwidth=1)
 
-        treescrolly = tk.Scrollbar(csvTable, orient= "vertical", command = tv1.yview)
-        treescrollx = tk.Scrollbar(csvTable, orient= "horizontal", command = tv1.xview)
+        treescrolly = tk.Scrollbar(csvTable, orient="vertical", command=tv1.yview)
+        treescrollx = tk.Scrollbar(csvTable, orient="horizontal", command=tv1.xview)
         tv1.configure(xscrollcommand=treescrollx.set, yscrollcommand=treescrolly.set)
         treescrollx.pack(side="bottom", fill="x")
         treescrolly.pack(side="right", fill="y")
 
-        def CheckColumnNames(checklist, csv_columns):
+        def checkInputs():
+            inputfields = ['year','wp6','wp7','wp8','wp9','wp10','wp11','wp12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','avghumidity','precipitation']
+            boolInputs = True
+            for inputfield in inputfields:
+                if(inputfield != 'year'):
+                    if(len(getattr(self, 'entry'+inputfield).get()) == 0):
+                        boolInputs = False
+                        break
+            if(boolInputs):
+                my_canvas.pack_forget(), GraphPage(container, self),my_scrollbar.pack_forget(),main_frame.pack_forget()
+            else:
+                if(filename == ''):
+                    messagebox.showerror("Error", "Upload eerst een CSV bestand en vul vervolgens alle velden in!")
+                else:
+                    messagebox.showerror("Error", "Vul eerst alle velden in!")
+
+        def checkColumnNames(checklist, csv_columns):
             for element in checklist:
                 if element not in csv_columns:
+                    print("Kolommen kloppen niet")
                     return False
+            print("Kolommen kloppen")
             return True
 
-        def CheckRows(selected_file):
+        def checkRows(selected_file):
             num_rows = -1
             for row in open(selected_file):
                 num_rows += 1
@@ -246,9 +280,21 @@ class Mainscreen(ttk.Frame):
                 print("Te weinig rows")
                 return False
 
+        def checkValues(df):
+            hasEmptyValues = df.isnull().values.any()
+            if(hasEmptyValues):
+                print("De geüploadde CSV bestand ontbreekt gegevens")
+                return False
+            else:
+                print("De geüploadde CSV bestand ontbreekt geen gegevens")
+                return True
+
         def load_Data(tv1,csv_data):
             try:
                 df = pd.read_csv(csv_data)
+                #clear treeview
+                for row in tv1.get_children():
+                    tv1.delete(row)
                 tv1["column"] = list(df.columns)
                 tv1["show"] = "headings"
                 for column in tv1["columns"]:
@@ -258,21 +304,18 @@ class Mainscreen(ttk.Frame):
                 for row in df_rows:
                     tv1.insert("", "end", values=row)
 
-                # missende data aanvullen met nan
-                df = df.fillna(np.nan)
-                # lijst maken van kolom namen door .columns 
+                # list with column names of user
                 list_of_column_names = list(df.columns)
                 check_list = ['year','punt1','punt2','punt3','windkracht6','windkracht7','windkracht8','windkracht9','windkracht10','windkracht11','windkracht12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','aveghumidity','neerslag']
-                # elk woord in de lijst zetten naar HOOFDLETTERS
+                # make list of column names case insensitive
                 list_of_column_names = [each_string.lower() for each_string in list_of_column_names]
-                #functie aanroepen
-                boolColumns = CheckColumnNames(check_list, list_of_column_names)
-                if(boolColumns):
-                    print("Kolommen kloppen")
-                else:
-                    print("Kolommen kloppen niet")
-                boolRows = CheckRows(csv_data)
-                return boolColumns, boolRows
+                boolColumns = checkColumnNames(check_list, list_of_column_names)
+                boolRows = checkRows(csv_data)
+                boolValues = checkValues(df)
+                #detect outliers
+                outliers = detect_outlier(df['punt1'])
+                print('outliers: ', outliers)
+                return boolColumns, boolRows, boolValues
             except:
                 tk.messagebox.showerror("Error", "Wrong file or file format!")
             return None
@@ -281,15 +324,13 @@ class Mainscreen(ttk.Frame):
             global filename
             filename = filedialog.askopenfilename(initialdir = "/",title = "Select file",filetypes = [("CSV files", '.csv')])
             if filename != '':
-                boolColumns, boolRows = load_Data(tv1,filename)
+                boolColumns, boolRows, boolValues = load_Data(tv1,filename)
                 inputfields = ['year','wp6','wp7','wp8','wp9','wp10','wp11','wp12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','avghumidity','precipitation']
-                if ((boolColumns == False) or (boolRows == False)):
-                    predictbutton["state"] = DISABLED
+                if ((boolColumns == False) or (boolRows == False) or (boolValues == False)):
                     for inputfield in inputfields:
                         getattr(self, 'entry'+inputfield)["state"] = DISABLED
                     uploadbutton.configure(bg="red")
-                if ((boolColumns == True) and (boolRows == True)):
-                    predictbutton["state"] = NORMAL
+                if ((boolColumns == True) and (boolRows == True) and (boolValues == True)):
                     for inputfield in inputfields:
                         getattr(self, 'entry'+inputfield)["state"] = NORMAL
                     uploadbutton.configure(bg="green")
@@ -299,7 +340,7 @@ def clearGraphpage(canvas):
         canvas.get_tk_widget().delete(item)
 
 
-def plotGraph(a,b,f,canvas,startpage,tv2,csvTable2):
+def plotGraph(a,f,canvas,startpage,tv2,csvTable2):
     start_page = startpage
     inputX = pd.DataFrame(columns=['year','windkracht6','windkracht7','windkracht8','windkracht9','windkracht10','windkracht11','windkracht12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','aveghumidity','neerslag'])
     inputX.loc[0] = [start_page.defaultSelect.get(),start_page.wp6.get(),start_page.wp7.get(),start_page.wp8.get(),start_page.wp9.get(),start_page.wp10.get(),start_page.wp11.get(),start_page.wp12.get(),start_page.north.get(),start_page.east.get(),
@@ -308,23 +349,16 @@ def plotGraph(a,b,f,canvas,startpage,tv2,csvTable2):
             
     df, y_dataset, listOfDataset, inputPredict, years, OutputDataframe = model_NN(filename,inputX)
     print('prediction of userinput: ', inputPredict)
-    difference = inputPredict[0] - listOfDataset[-1]
-    print('difference: ', difference)
     datasetActualx, datasetActualy = convertToList(years[:listOfDataset.shape[0]], y_dataset)
     datasetPredictedx, datasetPredictedy = convertToList(years[:listOfDataset.shape[0]], listOfDataset)
     userOutputx, userOutputy = convertToList(years[listOfDataset.shape[0]:listOfDataset.shape[0]+1], inputPredict)
 
     a.clear()
     a.plot(datasetPredictedx, datasetPredictedy,label="dataset predicted values",color='green')
+    a.plot(datasetActualx, datasetActualy,label="dataset actual values",color='purple')
     a.scatter(userOutputx,userOutputy,label="predicted user input",color='blue')
 
     a.legend()
-
-    b.clear()
-    b.plot(datasetActualx, datasetActualy,label="dataset actual values",color='purple')
-    b.scatter(userOutputx,datasetActualy[-1]+difference[0],label="predicted user input",color='blue')
-
-    b.legend()
     
     canvas.draw()
     canvas.get_tk_widget().grid(sticky="n", column=1,row=2)
@@ -369,13 +403,12 @@ class GraphPage(ttk.Frame):
                 )
             )
 
-        second_frame = Frame(my_canvas)
+        second_frame = Frame(my_canvas, bg=backgroundcolor)
 
         my_canvas.create_window((0,0), window=second_frame, anchor="nw")
 
         f = Figure(figsize=(10,10), dpi=100)
-        a = f.add_subplot(221)
-        b = f.add_subplot(223)
+        a = f.add_subplot(111)
         canvas = FigureCanvasTkAgg(f, second_frame)
 
         # Frame for Treeview
@@ -392,14 +425,14 @@ class GraphPage(ttk.Frame):
         treescrollx.pack(side="bottom", fill="x")
         treescrolly.pack(side="right", fill="y")
 
-        OutputDataframe = plotGraph(a,b,f,canvas,start_page,tv2,csvTable2)
+        OutputDataframe = plotGraph(a,f,canvas,start_page,tv2,csvTable2)
 
         homebutton = Button(second_frame,state = NORMAL, text="Terug naar startpagina", width=18,
                             command=lambda: [my_canvas.pack_forget(),csvTable2.grid_forget(),canvas.get_tk_widget().pack_forget(),clearGraphpage(canvas),my_scrollbar.pack_forget(),plot_frame.pack_forget(),Mainscreen(container)])
         homebutton.grid(row=0,column=1)
 
         downloadgraph = Button(second_frame,state = NORMAL, text="Download grafiek", width=18,
-                            command=lambda: [f.set_figheight(10),f.set_figwidth(20),f.savefig('downloads/duingroeivoorspelling.png', bbox_inches=b.get_window_extent().transformed(f.dpi_scale_trans.inverted()).expanded(1.2, 1.2))])
+                            command=lambda: [f.set_figheight(10),f.set_figwidth(20),f.savefig('downloads/duingroeivoorspelling.png')])
         downloadgraph.grid(sticky="e",row=1,column=1)
 
         downloadcsv = Button(second_frame,state = NORMAL, text="Download csv", width=18,

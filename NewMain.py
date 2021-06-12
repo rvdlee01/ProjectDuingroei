@@ -135,8 +135,8 @@ class Mainscreen(ttk.Frame):
 
         my_canvas.create_window((0,0), window=second_frame, anchor = "nw")
 
-        predictbutton = Button(second_frame,state = DISABLED, text="Voorspellen", width=18, bg="snow",
-                            command=lambda: [my_canvas.pack_forget(), GraphPage(container, self),my_scrollbar.pack_forget(),main_frame.pack_forget()])
+        predictbutton = Button(second_frame, text="Voorspellen", width=18, bg="snow",
+                            command=lambda: checkInputs())
         predictbutton.grid(row=0,column=2,padx=10,pady=15)
         uploadbutton = Button(second_frame, text="CSV bestand selecteren", width=18, bg="snow",
                             command=lambda: getCsvFile(uploadbutton, predictbutton, tv1))
@@ -174,21 +174,20 @@ class Mainscreen(ttk.Frame):
 
         # Validates if input is an integer
         def validateInput(var,P):
-            checkInputs()
             if (var == 'precipitation'):
                 try:
                     P == '' or float(P) >= 0
                     return True
                 except:
                     messagebox.showerror("Error", "Vul een geldig numerieke waarde in")
-                    return False
+                    return checkInputs(False)
             elif (str.isdigit(P) and (int(P) <= 365 and int(P) >= 0)) or P == '':
                 return True
             else:
                 messagebox.showerror("Error", "Vul een geldig numerieke waarde in.\nDe maximale waarde is 365.\nDe minimale waarde is 0.")
                 return False
             
-        vcmd = (self.register(validateInput))
+        vcmd = self.register(validateInput)
 
         rownumber = 2
         
@@ -237,15 +236,15 @@ class Mainscreen(ttk.Frame):
                 rownumber = 2
         
         # Frame for Treeview
-        csvTable = LabelFrame(second_frame,text ="CSV data", bg=backgroundcolor)
+        csvTable = LabelFrame(second_frame,text="CSV data", bg=backgroundcolor)
         csvTable.grid(padx=30,pady=25,ipadx=400,ipady=250,row=41,columnspan=6)
 
         # Treeview Widget
         tv1 = ttk.Treeview(csvTable)
         tv1.place(relheight=1, relwidth=1)
 
-        treescrolly = tk.Scrollbar(csvTable, orient= "vertical", command = tv1.yview)
-        treescrollx = tk.Scrollbar(csvTable, orient= "horizontal", command = tv1.xview)
+        treescrolly = tk.Scrollbar(csvTable, orient="vertical", command=tv1.yview)
+        treescrollx = tk.Scrollbar(csvTable, orient="horizontal", command=tv1.xview)
         tv1.configure(xscrollcommand=treescrollx.set, yscrollcommand=treescrolly.set)
         treescrollx.pack(side="bottom", fill="x")
         treescrolly.pack(side="right", fill="y")
@@ -257,10 +256,14 @@ class Mainscreen(ttk.Frame):
                 if(inputfield != 'year'):
                     if(len(getattr(self, 'entry'+inputfield).get()) == 0):
                         boolInputs = False
+                        break
             if(boolInputs):
-                predictbutton["state"] = NORMAL
+                my_canvas.pack_forget(), GraphPage(container, self),my_scrollbar.pack_forget(),main_frame.pack_forget()
             else:
-                predictbutton["state"] = DISABLED
+                if(filename == ''):
+                    messagebox.showerror("Error", "Upload eerst een CSV bestand en vul vervolgens alle velden in!")
+                else:
+                    messagebox.showerror("Error", "Vul eerst alle velden in!")
 
         def checkColumnNames(checklist, csv_columns):
             for element in checklist:

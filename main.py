@@ -44,6 +44,7 @@ def detect_outlier(data):
 def model_NN(filename,inputX):
     df = pd.read_csv(filename)
     df = df[df['jaar'] > 2002] #TEMP
+    df = df.sort_values(by=['jaar'])
 
     x = df[xcolumnnames]
     y = df[ycolumnname].values
@@ -334,18 +335,27 @@ class Mainscreen(ttk.Frame):
             df = df.sort_values(by=['jaar'])
             start = df['jaar'].iloc[0]
             end = df['jaar'].iloc[-1]
-            missingyears = "Het bestand bevat de volgende ontbrekende jaren:"
+            missingyears = ""
             for year in range(start,end+1,1):
                 if year not in list(df.jaar):
                     missingyears += " {}".format(year)
             if missingyears == "":
                 return True,missingyears
             else:
+                missingyears = "Het bestand bevat de volgende ontbrekende jaren:" + missingyears
                 return False,missingyears
                     
         def load_Data(tv1,csv_data):
             try:
                 df = pd.read_csv(csv_data)
+                
+                if 'jaar' in df:
+                    boolYear,missingyears = checkYear(df)
+                    if (boolYear):
+                        df = df.sort_values(by=['jaar'])
+                else:
+                    boolYear,missingyears = False, "Kolomnamen moeten overeenkomen met de vereiste kolomnamen voordat de 'jaar' kolom gecheckt kan worden!"
+                    
                 #clear treeview
                 for row in tv1.get_children():
                     tv1.delete(row)
@@ -365,12 +375,6 @@ class Mainscreen(ttk.Frame):
                 boolColumns = checkColumnNames(check_list, list_of_column_names)
                 boolRows = checkRows(csv_data)
                 boolValues = checkValues(df)
-                if 'jaar' in df:
-                    boolYear,missingyears = checkYear(df)
-                    if (boolYear):
-                        df = df.sort_values(by=['jaar'])
-                else:
-                    boolYear,missingyears = False, "Kolomnamen moeten overeenkomen met de vereiste kolomnamen voordat de 'jaar' kolom gecheckt kan worden!"
                 #detect outliers
                 #outliers = detect_outlier(df['duinhoogte'])
                 #print('outliers: ', outliers)

@@ -149,10 +149,12 @@ class Mainscreen(ttk.Frame):
         #Create help page window
         def helppage(root):
             if self.helppageactived == False:
-                helpWindow = Toplevel(root)
+                helpWindow = Toplevel(root, bg=backgroundcolor)
                 helpWindow.title("Hulppagina")
                 helpWindow.geometry("700x600")
-                Label(helpWindow,text ="Tekst voor hulppagina komt hier.").pack()
+                with open('helppage.txt') as f:
+                    contents = f.read()
+                Label(helpWindow,text = contents,anchor='nw',justify=LEFT,bg="white",font=('calibre',10)).pack()
                 self.helppageactived = True
                 self.helppage = helpWindow
                 helpWindow.protocol("WM_DELETE_WINDOW", on_closing)
@@ -259,7 +261,7 @@ class Mainscreen(ttk.Frame):
                 setattr(self,value,StringVar(second_frame))
                 getattr(self,value).set(2021) # default value
                 options = (2021)
-                selectbox = OptionMenu(second_frame, getattr(self,value), *options)
+                selectbox = OptionMenu(second_frame, getattr(self,value), options)
                 selectbox.grid(ipadx=30,row=rownumber, column=1,sticky="w")
                 selectbox['state'] = DISABLED
                 setattr(self,'entry'+value,selectbox)

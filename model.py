@@ -29,13 +29,14 @@ y_test = scaler.transform(np.array(y_test).reshape(-1,1))
 #Adding dense layers
 model = Sequential()
 #model.add(Dense(64, input_dim=19, activation='relu'))
-model.add(Dense(16, input_dim=19, activation='relu'))
-model.add(Dense(8, activation='relu'))
-model.add(Dense(1, activation='linear')) #maybe sigmoid? max 3 layers!
-model.compile(loss='mse', optimizer='adam')
+model.add(Dense(4, input_dim=19, activation='relu'))
+#model.add(Dense(8, activation='linear'))
+#model.add(Dense(2, activation='linear')) #maybe sigmoid? max 3 layers!
+model.add(Dense(1, activation='linear'))
+model.compile(loss='mse', optimizer='rmsprop')
 
 #train model
-model.fit(x_train,y_train, epochs=10, batch_size=50, verbose=0, shuffle=False)
+model.fit(x_train,y_train, epochs=100, batch_size=10, verbose=0, shuffle=False)
 
 # save the model to disk
 model.save('model')

@@ -120,7 +120,7 @@ class Mainscreen(ttk.Frame):
         main_frame = Frame(container)
         main_frame.pack(fill=BOTH, expand=1)
 
-        my_canvas = Canvas(main_frame)
+        my_canvas = Canvas(main_frame, bg=backgroundcolour)
         my_canvas.pack(side=LEFT, fill=BOTH, expand=1)
 
         second_frame = Frame(my_canvas, bg=backgroundcolour)
@@ -148,12 +148,12 @@ class Mainscreen(ttk.Frame):
 
         predictbutton = Button(second_frame, text="Voorspellen", width=18, bg=buttoncolour,
                             command=lambda: checkInputs())
-        predictbutton.grid(row=0,column=2,padx=10,pady=15)
+        predictbutton.grid(row=0,column=2,padx=10,pady=15,ipady=5)
         predictbutton.bind("<Enter>", lambda e: on_enter(e, hovercolour))
         predictbutton.bind("<Leave>", lambda e: on_leave(e, buttoncolour))
         uploadbutton = Button(second_frame, text="CSV bestand selecteren", width=18, bg=buttoncolour,
                             command=lambda: getCsvFile(uploadbutton, predictbutton, tv1))
-        uploadbutton.grid(row=0,column=1,padx=10,pady=15)
+        uploadbutton.grid(row=0,column=1,padx=10,pady=15,ipady=5)
         uploadbutton.bind("<Enter>", lambda e: on_enter(e, hovercolour))
         uploadbutton.bind("<Leave>", lambda e: on_leave(e, buttoncolour))
 
@@ -173,7 +173,7 @@ class Mainscreen(ttk.Frame):
                 help_main_frame = Frame(helpWindow)
                 help_main_frame.pack(fill=BOTH, expand=1)
 
-                helpCanvas = Canvas(help_main_frame)
+                helpCanvas = Canvas(help_main_frame, bg=backgroundcolour)
                 helpCanvas.pack(side=LEFT, fill=BOTH, expand=1)
 
                 help_second_frame = Frame(helpCanvas, bg=backgroundcolour)
@@ -214,8 +214,8 @@ class Mainscreen(ttk.Frame):
 
         self.helppageactived = False
         self.helppage = None
-        helpbutton = Button(second_frame, text ="Hulp nodig?", bg=buttoncolour, command = lambda: [helppage(container)])
-        helpbutton.grid(row=0,column=3,padx=10,pady=15)
+        helpbutton = Button(second_frame, text ="Hulp nodig?", bg=buttoncolour, width=18, command = lambda: [helppage(container)])
+        helpbutton.grid(row=0,column=3,padx=10,pady=15,ipady=5)
         helpbutton.bind("<Enter>", lambda e: on_enter(e, hovercolour))
         helpbutton.bind("<Leave>", lambda e: on_leave(e, buttoncolour))
         
@@ -501,9 +501,11 @@ def plotGraph(a,f,canvas,startpage,tv2,csvTable2):
     a.scatter(userOutputx,userOutputy,label="predicted user input",color='blue')
 
     a.legend()
+    a.set_xlabel('jaar',labelpad=10)
+    a.set_ylabel('duinhoogte [cm]',labelpad=10)
     
     canvas.draw()
-    canvas.get_tk_widget().grid(sticky="n", column=1,row=2)
+    canvas.get_tk_widget().grid(pady=25,row=2,columnspan=3)
 
     for i in tv2.get_children():
         tv2.delete(i)
@@ -517,7 +519,7 @@ def plotGraph(a,f,canvas,startpage,tv2,csvTable2):
     for row in df_rows:
         tv2.insert("", "end", values=row)
 
-    csvTable2.grid(sticky='n',ipadx=400,ipady=250, pady=25,column=1,row=3)
+    csvTable2.grid(ipadx=400,ipady=250, pady=25,row=3,columnspan=3)
 
     return OutputDataframe
 
@@ -528,7 +530,7 @@ class GraphPage(ttk.Frame):
         plot_frame = Frame(container)
         plot_frame.pack(fill=BOTH, expand=1)
 
-        my_canvas = Canvas(plot_frame)
+        my_canvas = Canvas(plot_frame, bg=backgroundcolour)
         my_canvas.pack(side=LEFT, fill=BOTH, expand=1)
 
         second_frame = Frame(my_canvas, bg=backgroundcolour)
@@ -555,20 +557,19 @@ class GraphPage(ttk.Frame):
                            )
                        )
 
-        f = Figure(figsize=(10,10), dpi=100)
+        f = Figure(figsize=(10,5), dpi=100)
         a = f.add_subplot(111)
         canvas = FigureCanvasTkAgg(f, second_frame)
 
         # Frame for Treeview
-        csvTable2 = LabelFrame(second_frame,text ="Grafiek gegevens",bg=backgroundcolour)
-        csvTable2.grid(padx=30,pady=25,ipadx=400,ipady=250,row=2,column=1)
+        csvTable2 = LabelFrame(second_frame,text="Grafiek gegevens",bg=backgroundcolour)
 
         # Treeview Widget
         tv2 = ttk.Treeview(csvTable2)
         tv2.place(relheight=1, relwidth=1)
 
-        treescrolly = Scrollbar(csvTable2, orient= "vertical", command = tv2.yview)
-        treescrollx = Scrollbar(csvTable2, orient= "horizontal", command = tv2.xview)
+        treescrolly = Scrollbar(csvTable2, orient="vertical", command=tv2.yview)
+        treescrollx = Scrollbar(csvTable2, orient="horizontal", command=tv2.xview)
         tv2.configure(xscrollcommand=treescrollx.set, yscrollcommand=treescrolly.set)
         treescrollx.pack(side="bottom", fill="x")
         treescrolly.pack(side="right", fill="y")
@@ -577,19 +578,22 @@ class GraphPage(ttk.Frame):
 
         homebutton = Button(second_frame,state = NORMAL, text="Terug naar startpagina", width=18, bg=buttoncolour,
                             command=lambda: [my_canvas.pack_forget(),csvTable2.grid_forget(),canvas.get_tk_widget().pack_forget(),clearGraphpage(canvas),my_scrollbar.pack_forget(),plot_frame.pack_forget(),Mainscreen(container)])
-        homebutton.grid(row=0,column=1)
+        homebutton.grid(padx=10,pady=15,ipady=5,row=0,column=1)
+        
         homebutton.bind("<Enter>", lambda e: on_enter(e, hovercolour))
         homebutton.bind("<Leave>", lambda e: on_leave(e, buttoncolour))
 
         downloadgraph = Button(second_frame,state = NORMAL, text="Download grafiek", width=18, bg=buttoncolour,
                             command=lambda: [f.set_figheight(10),f.set_figwidth(20),f.savefig('downloads/duingroeivoorspelling.png')])
-        downloadgraph.grid(sticky="e",row=1,column=1)
+        downloadgraph.grid(padx=10,ipady=5,row=1,column=0)
+        
         downloadgraph.bind("<Enter>", lambda e: on_enter(e, hovercolour))
         downloadgraph.bind("<Leave>", lambda e: on_leave(e, buttoncolour))
 
         downloadcsv = Button(second_frame,state = NORMAL, text="Download csv", width=18, bg=buttoncolour,
                             command=lambda: [OutputDataframe.to_csv('downloads/PredictedOutputs.csv', index=False)])
-        downloadcsv.grid(sticky="w",row=1,column=1)
+        downloadcsv.grid(padx=10,ipady=5,row=1,column=2)
+        
         downloadcsv.bind("<Enter>", lambda e: on_enter(e, hovercolour))
         downloadcsv.bind("<Leave>", lambda e: on_leave(e, buttoncolour))
             

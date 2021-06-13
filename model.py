@@ -8,7 +8,6 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 
 df = pd.read_csv('newdataColumns.csv')
-df=df[df['jaar'] > 2002]
 
 x = df[['windkracht6','windkracht7','windkracht8','windkracht9','windkracht10','windkracht11','windkracht12','noord','oost','zuid','west','noord-oosten','zuid-oosten','zuid-westen','noord-westen','hogeluchtvochtigheid',
                 'lageluchtvochtigheid','gemiddeldeluchtvochtigheid','neerslag']]
@@ -28,13 +27,13 @@ y_test = scaler.transform(np.array(y_test).reshape(-1,1))
 
 #Adding dense layers
 model = Sequential()
-model.add(Dense(16, input_dim=19, activation='linear'))
-model.add(Dense(8, activation='linear'))
+model.add(Dense(10, input_dim=19, activation='relu'))
+model.add(Dense(5, activation='relu'))
 model.add(Dense(1, activation='linear'))
 model.compile(loss='mse', optimizer='adam')
 
 #train model
-model.fit(x_train,y_train, epochs=20, batch_size=50, verbose=0, shuffle=False)
+model.fit(x_train,y_train, epochs=40, batch_size=20, verbose=0, shuffle=False)
 
 # save the model to disk
 model.save('model')

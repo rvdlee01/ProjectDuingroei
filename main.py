@@ -45,7 +45,6 @@ def detect_outlier(data):
 
 def model_NN(filename,inputX):
     df = pd.read_csv(filename)
-    df = df[df['jaar'] > 2002] #TEMP
     df = df.sort_values(by=['jaar'])
 
     x = df[xcolumnnames]

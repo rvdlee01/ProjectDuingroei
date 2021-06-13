@@ -10,8 +10,8 @@ from sklearn.model_selection import train_test_split
 df = pd.read_csv('newdataColumns.csv')
 df=df[df['jaar'] > 2002]
 
-df['YYYYMMDD'] = df['jaar']
-x = df[['windkracht6','windkracht7','windkracht8','windkracht9','windkracht10','windkracht11','windkracht12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','aveghumidity','neerslag']]
+x = df[['windkracht6','windkracht7','windkracht8','windkracht9','windkracht10','windkracht11','windkracht12','noord','oost','zuid','west','noord-oosten','zuid-oosten','zuid-westen','noord-westen','hogeluchtvochtigheid',
+                'lageluchtvochtigheid','gemiddeldeluchtvochtigheid','neerslag']]
 y = df['duinhoogte'].values
     
 #90% training data & 10% testing data
@@ -28,15 +28,13 @@ y_test = scaler.transform(np.array(y_test).reshape(-1,1))
 
 #Adding dense layers
 model = Sequential()
-#model.add(Dense(64, input_dim=19, activation='relu'))
-model.add(Dense(4, input_dim=19, activation='relu'))
-#model.add(Dense(8, activation='linear'))
-#model.add(Dense(2, activation='linear')) #maybe sigmoid? max 3 layers!
+model.add(Dense(16, input_dim=19, activation='linear'))
+model.add(Dense(8, activation='linear'))
 model.add(Dense(1, activation='linear'))
-model.compile(loss='mse', optimizer='rmsprop')
+model.compile(loss='mse', optimizer='adam')
 
 #train model
-model.fit(x_train,y_train, epochs=100, batch_size=10, verbose=0, shuffle=False)
+model.fit(x_train,y_train, epochs=20, batch_size=50, verbose=0, shuffle=False)
 
 # save the model to disk
 model.save('model')

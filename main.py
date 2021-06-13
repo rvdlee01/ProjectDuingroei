@@ -23,11 +23,13 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 
 filename =''
-backgroundcolor="floral white"
+backgroundcolour="floral white"
 labelfont = ('calibre',10, 'bold')
 xcolumnnames = ['windkracht6','windkracht7','windkracht8','windkracht9','windkracht10','windkracht11','windkracht12','noord','oost','zuid','west','noord-oosten','zuid-oosten','zuid-westen','noord-westen','hogeluchtvochtigheid',
                 'lageluchtvochtigheid','gemiddeldeluchtvochtigheid','neerslag']
 ycolumnname = 'duinhoogte'
+hovercolour = "LightBlue2"
+buttoncolour = "snow"
 
 def detect_outlier(data):
     outliers = []
@@ -107,6 +109,12 @@ def convertToList(arrayX, arrayY):
         x.append(xas)
     return x, y
 
+def on_enter(e, colour):
+    e.widget['background'] = colour
+
+def on_leave(e, colour):
+    e.widget['background'] = colour
+
 class Mainscreen(ttk.Frame):
     def __init__(self, container, *args, **kwargs):
         super().__init__(container, *args, **kwargs)
@@ -130,16 +138,20 @@ class Mainscreen(ttk.Frame):
                 )
             )
 
-        second_frame = Frame(my_canvas, bg=backgroundcolor)
+        second_frame = Frame(my_canvas, bg=backgroundcolour)
 
         my_canvas.create_window((0,0), window=second_frame, anchor = "nw")
 
-        predictbutton = Button(second_frame, text="Voorspellen", width=18, bg="snow",
+        predictbutton = Button(second_frame, text="Voorspellen", width=18, bg=buttoncolour,
                             command=lambda: checkInputs())
         predictbutton.grid(row=0,column=2,padx=10,pady=15)
-        uploadbutton = Button(second_frame, text="CSV bestand selecteren", width=18, bg="snow",
+        predictbutton.bind("<Enter>", lambda e: on_enter(e, hovercolour))
+        predictbutton.bind("<Leave>", lambda e: on_leave(e, buttoncolour))
+        uploadbutton = Button(second_frame, text="CSV bestand selecteren", width=18, bg=buttoncolour,
                             command=lambda: getCsvFile(uploadbutton, predictbutton, tv1))
         uploadbutton.grid(row=0,column=1,padx=10,pady=15)
+        uploadbutton.bind("<Enter>", lambda e: on_enter(e, hovercolour))
+        uploadbutton.bind("<Leave>", lambda e: on_leave(e, buttoncolour))
 
         #Close help page window
         def on_closing():
@@ -163,8 +175,10 @@ class Mainscreen(ttk.Frame):
 
         self.helppageactived = False
         self.helppage = None
-        helpbutton = Button(second_frame, text ="Hulp nodig?", bg="snow", command = lambda: [helppage(container)])
+        helpbutton = Button(second_frame, text ="Hulp nodig?", bg=buttoncolour, command = lambda: [helppage(container)])
         helpbutton.grid(row=0,column=3,padx=10,pady=15)
+        helpbutton.bind("<Enter>", lambda e: on_enter(e, hovercolour))
+        helpbutton.bind("<Leave>", lambda e: on_leave(e, buttoncolour))
         
         listOfInputVariables = ['year','wp6','wp7','wp8','wp9','wp10','wp11','wp12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','avghumidity','precipitation']
         listOfWP = ['wp6','wp7','wp8','wp9','wp10','wp11','wp12']
@@ -227,10 +241,10 @@ class Mainscreen(ttk.Frame):
             setattr(self,value,StringVar())
             if value == 'year':
                 # Year entry box and label
-                setattr(self,value+'_label',Label(second_frame, text = 'Jaar', font=labelfont, bg=backgroundcolor).grid(padx=30,row=rownumber,column=0,sticky="e"))
+                setattr(self,value+'_label',Label(second_frame, text = 'Jaar', font=labelfont, bg=backgroundcolour).grid(padx=30,row=rownumber,column=0,sticky="e"))
             elif 'wp' in value:
                 # Wind power entry boxes and labels
-                setattr(self,value+'_label',Label(second_frame, text = 'Aantal dagen met windkracht ' + str(count), font=labelfont, bg=backgroundcolor).grid(padx=30,row=rownumber,column=0,sticky="e"))
+                setattr(self,value+'_label',Label(second_frame, text = 'Aantal dagen met windkracht ' + str(count), font=labelfont, bg=backgroundcolour).grid(padx=30,row=rownumber,column=0,sticky="e"))
                 count += 1
                 columnnumber = 1
             elif value in dictOfDirections.keys():
@@ -238,29 +252,31 @@ class Mainscreen(ttk.Frame):
                 for k, v in dictOfDirections.items():
                     if k == value:
                         textInputWD = 'Aantal dagen met wind vanuit het ' + v
-                setattr(self,value+'_label',Label(second_frame, text = textInputWD, font=labelfont, bg=backgroundcolor).grid(padx=30,row=rownumber,column=2,sticky="e"))
+                setattr(self,value+'_label',Label(second_frame, text = textInputWD, font=labelfont, bg=backgroundcolour).grid(padx=30,row=rownumber,column=2,sticky="e"))
                 columnnumber = 3
             elif value in dictOfHumidity.keys():
                 # Humidity entry boxes and labels
                 for k, v in dictOfHumidity.items():
                     if k == value:
                         textInputH = 'Aantal dagen met een ' + v
-                setattr(self,value+'_label',Label(second_frame, text = textInputH, font=labelfont, bg=backgroundcolor).grid(padx=30,row=rownumber,column=4,sticky="e"))
+                setattr(self,value+'_label',Label(second_frame, text = textInputH, font=labelfont, bg=backgroundcolour).grid(padx=30,row=rownumber,column=4,sticky="e"))
                 columnnumber = 5
             elif value == 'precipitation':
                 # Precipitation entry box and label
-                setattr(self,value+'_label',Label(second_frame, text = 'Neerslag in een jaar', font=labelfont, bg=backgroundcolor).grid(padx=30,row=rownumber,column=4,sticky="e"))
+                setattr(self,value+'_label',Label(second_frame, text = 'Neerslag in een jaar', font=labelfont, bg=backgroundcolour).grid(padx=30,row=rownumber,column=4,sticky="e"))
                 columnnumber = 5
             if value != 'year':
                 inputfield = Entry(second_frame, textvariable = getattr(self,value),validate='key', validatecommand=(vcmd,value,'%P'), state=DISABLED)
-                inputfield.grid(row=rownumber,column=columnnumber,pady=5,sticky="w")
+                inputfield.grid(row=rownumber,column=columnnumber,ipadx=5,pady=5,ipady=5,sticky="ew")
                 setattr(self,'entry'+value,inputfield)
             else:
                 setattr(self,value,StringVar(second_frame))
-                getattr(self,value).set(2021) # default value
-                options = (2021)
-                selectbox = OptionMenu(second_frame, getattr(self,value), *options)
-                selectbox.grid(ipadx=30,row=rownumber, column=1,sticky="w")
+                getattr(self,value).set("Selecteer een jaar") # default value
+                options = ()
+                selectbox = OptionMenu(second_frame, getattr(self,value), options)
+                selectbox.config(bg = buttoncolour, activebackground = hovercolour)
+                selectbox["menu"].config(bg = buttoncolour)
+                selectbox.grid(ipadx=5,ipady=5,row=rownumber, column=1,sticky="ew")
                 selectbox['state'] = DISABLED
                 setattr(self,'entry'+value,selectbox)
             rownumber += 1
@@ -268,7 +284,7 @@ class Mainscreen(ttk.Frame):
                 rownumber = 2
         
         # Frame for Treeview
-        csvTable = LabelFrame(second_frame,text="CSV data", bg=backgroundcolor)
+        csvTable = LabelFrame(second_frame,text="CSV data", bg=backgroundcolour)
         csvTable.grid(padx=30,pady=25,ipadx=400,ipady=250,row=41,columnspan=6)
 
         # Treeview Widget
@@ -283,11 +299,16 @@ class Mainscreen(ttk.Frame):
 
         def checkInputs():
             boolInputs = True
+            boolSelectedYear = True
             for inputfield in listOfInputVariables:
                 if(inputfield != 'year'):
                     if(len(getattr(self, 'entry'+inputfield).get()) == 0):
                         boolInputs = False
-                        break
+                else:
+                    print('year: ',getattr(self,inputfield).get())
+                    print('is string?: ',isinstance(getattr(self,inputfield).get(), str))
+                    if(len(getattr(self,inputfield).get()) != 4):
+                        boolSelectedYear = False
             sumOfWP,sumOfDirections,sumOfHumidity = 0,0,0
             allCategories = listOfWP,list(dictOfDirections.keys()),list(dictOfHumidity.keys())
             for categorie in allCategories: #wind power / wind direction / humidity
@@ -299,13 +320,19 @@ class Mainscreen(ttk.Frame):
                             sumOfDirections += int(getattr(self,label).get())
                         elif(label in list(dictOfHumidity.keys())):
                             sumOfHumidity += int(getattr(self,label).get())
-            if(boolInputs and (sumOfWP == sumOfDirections and sumOfWP == sumOfHumidity)):
+            if((boolInputs and boolSelectedYear) and (sumOfWP == sumOfDirections and sumOfWP == sumOfHumidity)):
                 my_canvas.pack_forget(), GraphPage(container, self),my_scrollbar.pack_forget(),main_frame.pack_forget()
             else:
                 if(filename == ''):
-                    messagebox.showerror("Error", "Upload eerst een CSV bestand en vul vervolgens alle velden in!")
-                elif(boolInputs == False):
-                    messagebox.showerror("Error", "Vul eerst alle velden in!")
+                    messagebox.showerror("Error", "Selecteer eerst een CSV bestand en vul vervolgens de onderstaande velden in!")
+                elif((boolInputs == False) or (boolSelectedYear == False)):
+                    print('inputvelden ingevuld?: ',boolInputs, 'jaar geselecteerd?: ',boolSelectedYear)
+                    if((boolInputs == False) and (boolSelectedYear != False)):
+                        messagebox.showerror("Error", "Vul eerst alle velden in!")
+                    elif((boolInputs != False) and (boolSelectedYear == False)):
+                        messagebox.showerror("Error", "Selecteer eerst een jaar voor de voorspelling!")
+                    else:
+                        messagebox.showerror("Error", "Vul eerst alle velden in en selecteer een jaar voor de voorspelling!")
                 elif(sumOfWP != sumOfDirections or sumOfWP != sumOfHumidity):
                     messagebox.showerror("Error", "De totaal aantal dagen komen niet met elkaar overeen!\nTotaal aantal dagen bij windkrachten: " + str(sumOfWP)
                                          + "\nTotaal aantal dagen bij windrichtingen: " + str(sumOfDirections) + "\nTotaal aantal dagen bij luchtvochtigheid: " + str(sumOfHumidity))
@@ -376,10 +403,11 @@ class Mainscreen(ttk.Frame):
                 boolColumns = checkColumnNames(check_list, list_of_column_names)
                 boolRows = checkRows(csv_data)
                 boolValues = checkValues(df)
+                lastyear = df['jaar'].iloc[-1]
                 #detect outliers
                 #outliers = detect_outlier(df['duinhoogte'])
                 #print('outliers: ', outliers)
-                return boolColumns, boolRows, boolValues, boolYear, missingyears
+                return boolColumns, boolRows, boolValues, boolYear, missingyears, lastyear
             except:
                 tk.messagebox.showerror("Error", "Ongeldig bestand")
             return None
@@ -388,11 +416,12 @@ class Mainscreen(ttk.Frame):
             global filename
             filename = filedialog.askopenfilename(initialdir = "/",title = "Select file",filetypes = [("CSV files", '.csv')])
             if filename != '':
-                boolColumns, boolRows, boolValues, boolYear, missingyears = load_Data(tv1,filename)
+                boolColumns, boolRows, boolValues, boolYear, missingyears, lastyear = load_Data(tv1,filename)
                 if ((boolColumns == False) or (boolRows == False) or (boolValues == False) or (boolYear == False)):
                     for inputfield in listOfInputVariables:
                         getattr(self, 'entry'+inputfield)["state"] = DISABLED
-                    uploadbutton.configure(bg="red")
+                    uploadbutton.configure(bg="red", activebackground=hovercolour)
+                    uploadbutton.bind("<Leave>", lambda e: on_enter(e, "red"))
                     csvErrorMessage = ""
                     if(boolColumns == False):
                         csvErrorMessage += "Kolomnamen komen niet overeen met de vereiste kolomnamen!\n"
@@ -406,7 +435,11 @@ class Mainscreen(ttk.Frame):
                 if ((boolColumns == True) and (boolRows == True) and (boolValues == True) and (boolYear == True)):
                     for inputfield in listOfInputVariables:
                         getattr(self, 'entry'+inputfield)["state"] = NORMAL
-                    uploadbutton.configure(bg="green")
+                    uploadbutton.configure(bg="lime green", activebackground=hovercolour)
+                    uploadbutton.bind("<Leave>", lambda e: on_enter(e, "lime green"))
+                    selectbox['menu'].delete(0,'end')
+                    options = (lastyear + 1)
+                    selectbox['menu'].add_command(label=options, command=tk._setit(getattr(self,'year'), options))
 
 def clearGraphpage(canvas):
     for item in canvas.get_tk_widget().find_all():
@@ -476,7 +509,7 @@ class GraphPage(ttk.Frame):
                 )
             )
 
-        second_frame = Frame(my_canvas, bg=backgroundcolor)
+        second_frame = Frame(my_canvas, bg=backgroundcolour)
 
         my_canvas.create_window((0,0), window=second_frame, anchor="nw")
 
@@ -485,7 +518,7 @@ class GraphPage(ttk.Frame):
         canvas = FigureCanvasTkAgg(f, second_frame)
 
         # Frame for Treeview
-        csvTable2 = LabelFrame(second_frame,text ="CSV data")
+        csvTable2 = LabelFrame(second_frame,text ="Grafiek gegevens",bg=backgroundcolour)
         csvTable2.grid(padx=30,pady=25,ipadx=400,ipady=250,row=2,column=1)
 
         # Treeview Widget
@@ -500,17 +533,23 @@ class GraphPage(ttk.Frame):
 
         OutputDataframe = plotGraph(a,f,canvas,start_page,tv2,csvTable2)
 
-        homebutton = Button(second_frame,state = NORMAL, text="Terug naar startpagina", width=18,
+        homebutton = Button(second_frame,state = NORMAL, text="Terug naar startpagina", width=18, bg=buttoncolour,
                             command=lambda: [my_canvas.pack_forget(),csvTable2.grid_forget(),canvas.get_tk_widget().pack_forget(),clearGraphpage(canvas),my_scrollbar.pack_forget(),plot_frame.pack_forget(),Mainscreen(container)])
         homebutton.grid(row=0,column=1)
+        homebutton.bind("<Enter>", lambda e: on_enter(e, hovercolour))
+        homebutton.bind("<Leave>", lambda e: on_leave(e, buttoncolour))
 
-        downloadgraph = Button(second_frame,state = NORMAL, text="Download grafiek", width=18,
+        downloadgraph = Button(second_frame,state = NORMAL, text="Download grafiek", width=18, bg=buttoncolour,
                             command=lambda: [f.set_figheight(10),f.set_figwidth(20),f.savefig('downloads/duingroeivoorspelling.png')])
         downloadgraph.grid(sticky="e",row=1,column=1)
+        downloadgraph.bind("<Enter>", lambda e: on_enter(e, hovercolour))
+        downloadgraph.bind("<Leave>", lambda e: on_leave(e, buttoncolour))
 
-        downloadcsv = Button(second_frame,state = NORMAL, text="Download csv", width=18,
+        downloadcsv = Button(second_frame,state = NORMAL, text="Download csv", width=18, bg=buttoncolour,
                             command=lambda: [OutputDataframe.to_csv('downloads/PredictedOutputs.csv', index=False)])
         downloadcsv.grid(sticky="w",row=1,column=1)
+        downloadcsv.bind("<Enter>", lambda e: on_enter(e, hovercolour))
+        downloadcsv.bind("<Leave>", lambda e: on_leave(e, buttoncolour))
             
 def main():
     root = tk.Tk()

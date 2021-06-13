@@ -596,6 +596,17 @@ class GraphPage(ttk.Frame):
         
         downloadcsv.bind("<Enter>", lambda e: on_enter(e, hovercolour))
         downloadcsv.bind("<Leave>", lambda e: on_leave(e, buttoncolour))
+
+        def getAccuracy(OutputDataframe):
+            acc = []
+            for errorrate in OutputDataframe['Foutpercentage'][:len(OutputDataframe['Foutpercentage']) - 1]:
+                acc.append(1-(abs(errorrate)/100))
+            accuracy = sum(acc)/len(acc)
+            return round(accuracy*100,2)
+    
+        #label accuracy
+        accuracyLabel = Label(second_frame, text="Nauwkeurigheid van model: "+str(getAccuracy(OutputDataframe))+"%", bg=backgroundcolour )
+        accuracyLabel.grid(padx=10,pady=5,row=1,column=1)
             
 def main():
     root = tk.Tk()

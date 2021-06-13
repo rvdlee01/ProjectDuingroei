@@ -129,17 +129,17 @@ class Mainscreen(ttk.Frame):
         my_scrollbar.pack(side=RIGHT, fill=Y)
 
         my_canvas.configure(yscrollcommand=my_scrollbar.set)
-    
+
+        second_frame = Frame(my_canvas, bg=backgroundcolour)
+
+        my_canvas.create_window((0,0), window=second_frame, anchor = "nw")
+
         my_canvas.bind(
                 "<Configure>",
                 lambda e: my_canvas.configure(
                     scrollregion=my_canvas.bbox("all")
                 )
             )
-
-        second_frame = Frame(my_canvas, bg=backgroundcolour)
-
-        my_canvas.create_window((0,0), window=second_frame, anchor = "nw")
 
         predictbutton = Button(second_frame, text="Voorspellen", width=18, bg=buttoncolour,
                             command=lambda: checkInputs())
@@ -163,15 +163,42 @@ class Mainscreen(ttk.Frame):
                 helpWindow = Toplevel(root, bg=backgroundcolour)
                 helpWindow.title("Hulppagina")
                 helpWindow.geometry("700x600")
+
+                #create scrollable frame for new window
+                help_main_frame = Frame(helpWindow)
+                help_main_frame.pack(fill=BOTH, expand=1)
+
+                helpCanvas = Canvas(help_main_frame)
+                helpCanvas.pack(side=LEFT, fill=BOTH, expand=1)
+
+                helpCanvas.bind_all("<MouseWheel>",lambda event: helpCanvas.yview_scroll(int(-1*(event.delta/120)), "units"))
+
+                helpScrollbar = ttk.Scrollbar(help_main_frame, orient=VERTICAL, command=helpCanvas.yview)
+                helpScrollbar.pack(side=RIGHT, fill=Y)
+
+                helpCanvas.configure(yscrollcommand=helpScrollbar.set)
+
+                help_second_frame = Frame(helpCanvas, bg=backgroundcolour)
+
+                helpCanvas.create_window((0,0), window=help_second_frame, anchor = "nw")
+
+                helpCanvas.bind(
+                        "<Configure>",
+                        lambda e: helpCanvas.configure(
+                            scrollregion=helpCanvas.bbox("all")
+                        )
+                    )
+                
                 with open('helppage.txt') as f:
                     contents = f.read()
-                Label(helpWindow,text = contents,anchor='nw',justify=LEFT,bg="white",font=('calibre',10)).pack()
+                Label(help_second_frame,text = contents,anchor='nw',justify=LEFT,bg="white",font=('calibre',10)).pack()
                 self.helppageactived = True
                 self.helppage = helpWindow
                 helpWindow.protocol("WM_DELETE_WINDOW", on_closing)
             else:
-                #flash window and activate bell sound if help page is already opened
+                #flash window
                 self.helppage.focus_force()
+                #activate bell sound if the help page is already opened
                 self.helppage.bell()
 
         self.helppageactived = False

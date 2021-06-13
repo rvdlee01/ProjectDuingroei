@@ -123,6 +123,10 @@ class Mainscreen(ttk.Frame):
         my_canvas = Canvas(main_frame)
         my_canvas.pack(side=LEFT, fill=BOTH, expand=1)
 
+        second_frame = Frame(my_canvas, bg=backgroundcolour)
+
+        frame_n_canvas_id = my_canvas.create_window((0,0), window=second_frame, anchor = "nw")
+
         my_canvas.bind_all("<MouseWheel>",lambda event: my_canvas.yview_scroll(int(-1*(event.delta/120)), "units"))
 
         my_scrollbar = ttk.Scrollbar(main_frame, orient=VERTICAL, command=my_canvas.yview)
@@ -130,16 +134,17 @@ class Mainscreen(ttk.Frame):
 
         my_canvas.configure(yscrollcommand=my_scrollbar.set)
 
-        second_frame = Frame(my_canvas, bg=backgroundcolour)
-
-        my_canvas.create_window((0,0), window=second_frame, anchor = "nw")
-
-        my_canvas.bind(
+        main_frame.bind(
                 "<Configure>",
                 lambda e: my_canvas.configure(
                     scrollregion=my_canvas.bbox("all")
                 )
             )
+        my_canvas.bind("<Configure>",
+                       lambda event: event.widget.itemconfigure(
+                           frame_n_canvas_id, width=event.widget.winfo_width()
+                           )
+                       )
 
         predictbutton = Button(second_frame, text="Voorspellen", width=18, bg=buttoncolour,
                             command=lambda: checkInputs())
@@ -171,6 +176,10 @@ class Mainscreen(ttk.Frame):
                 helpCanvas = Canvas(help_main_frame)
                 helpCanvas.pack(side=LEFT, fill=BOTH, expand=1)
 
+                help_second_frame = Frame(helpCanvas, bg=backgroundcolour)
+
+                help_frame_n_canvas_id = helpCanvas.create_window((0,0), window=help_second_frame, anchor = "nw")
+
                 helpCanvas.bind_all("<MouseWheel>",lambda event: helpCanvas.yview_scroll(int(-1*(event.delta/120)), "units"))
 
                 helpScrollbar = ttk.Scrollbar(help_main_frame, orient=VERTICAL, command=helpCanvas.yview)
@@ -178,16 +187,18 @@ class Mainscreen(ttk.Frame):
 
                 helpCanvas.configure(yscrollcommand=helpScrollbar.set)
 
-                help_second_frame = Frame(helpCanvas, bg=backgroundcolour)
-
-                helpCanvas.create_window((0,0), window=help_second_frame, anchor = "nw")
-
-                helpCanvas.bind(
+                helpWindow.bind(
                         "<Configure>",
                         lambda e: helpCanvas.configure(
                             scrollregion=helpCanvas.bbox("all")
                         )
                     )
+
+                helpCanvas.bind("<Configure>",
+                       lambda event: event.widget.itemconfigure(
+                           help_frame_n_canvas_id, width=event.widget.winfo_width()
+                           )
+                       )
                 
                 with open('helppage.txt') as f:
                     contents = f.read()
@@ -520,6 +531,10 @@ class GraphPage(ttk.Frame):
         my_canvas = Canvas(plot_frame)
         my_canvas.pack(side=LEFT, fill=BOTH, expand=1)
 
+        second_frame = Frame(my_canvas, bg=backgroundcolour)
+
+        frame_n_canvas_id = my_canvas.create_window((0,0), window=second_frame, anchor="nw")
+
         my_canvas.bind_all("<MouseWheel>",lambda event: my_canvas.yview_scroll(int(-1*(event.delta/120)), "units"))
 
         my_scrollbar = ttk.Scrollbar(plot_frame, orient=VERTICAL, command=my_canvas.yview)
@@ -527,16 +542,18 @@ class GraphPage(ttk.Frame):
 
         my_canvas.configure(yscrollcommand=my_scrollbar.set)
     
-        my_canvas.bind(
+        plot_frame.bind(
                 "<Configure>",
                 lambda e: my_canvas.configure(
                     scrollregion=my_canvas.bbox("all")
                 )
             )
-
-        second_frame = Frame(my_canvas, bg=backgroundcolour)
-
-        my_canvas.create_window((0,0), window=second_frame, anchor="nw")
+        
+        my_canvas.bind("<Configure>",
+                       lambda event: event.widget.itemconfigure(
+                           frame_n_canvas_id, width=event.widget.winfo_width()
+                           )
+                       )
 
         f = Figure(figsize=(10,10), dpi=100)
         a = f.add_subplot(111)
@@ -578,7 +595,7 @@ class GraphPage(ttk.Frame):
             
 def main():
     root = tk.Tk()
-    root.geometry('1400x800')
+    root.geometry('1500x800')
 
     Mainscreen(root)
     

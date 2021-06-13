@@ -161,7 +161,7 @@ class Mainscreen(ttk.Frame):
         #Create help page window
         def helppage(root):
             if self.helppageactived == False:
-                helpWindow = Toplevel(root, bg=backgroundcolor)
+                helpWindow = Toplevel(root, bg=backgroundcolour)
                 helpWindow.title("Hulppagina")
                 helpWindow.geometry("700x600")
                 with open('helppage.txt') as f:
@@ -307,8 +307,6 @@ class Mainscreen(ttk.Frame):
                     if(len(getattr(self, 'entry'+inputfield).get()) == 0):
                         boolInputs = False
                 else:
-                    print('year: ',getattr(self,inputfield).get())
-                    print('is string?: ',isinstance(getattr(self,inputfield).get(), str))
                     if(len(getattr(self,inputfield).get()) != 4):
                         boolSelectedYear = False
             sumOfWP,sumOfDirections,sumOfHumidity = 0,0,0
@@ -328,7 +326,6 @@ class Mainscreen(ttk.Frame):
                 if(filename == ''):
                     messagebox.showerror("Error", "Selecteer eerst een CSV bestand en vul vervolgens de onderstaande velden in!")
                 elif((boolInputs == False) or (boolSelectedYear == False)):
-                    print('inputvelden ingevuld?: ',boolInputs, 'jaar geselecteerd?: ',boolSelectedYear)
                     if((boolInputs == False) and (boolSelectedYear != False)):
                         messagebox.showerror("Error", "Vul eerst alle velden in!")
                     elif((boolInputs != False) and (boolSelectedYear == False)):

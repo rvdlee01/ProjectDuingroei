@@ -38,11 +38,13 @@ De csv-bestand moet aan de volgende eisen voldoen:
 
 Stap 2. Invulvelden
 Op de startpagina staan een aantal velden die ingevuld moeten worden om een voorspelling te kunnen maken. 
-1) Selecteer de jaar waar u de duingroei voor wilt voorspellen. De applicatie berekent de jaar waar u voor kunt voorspellen door de meest recente jaar uit uw bestand te pakken en hier een jaar bij op te tellen.
+1) Selecteer het jaar waar u de duingroei voor wilt voorspellen. De applicatie berekent het jaar waar u voor kunt voorspellen door de meest recente jaar uit uw bestand te pakken en hier een jaar bij op te tellen.
 2) Vul de aantal verwachte dagen in met windkracht 6-12 in de windkrachtvelden. De maximale waarde van alle windkrachtvelden bij elkaar is 365 (dagen). 
-3) Vul de aantal verwachte dagen in met windrichtingen in de windrichtingsvelden. De maximale waarde van alle windrichtingsvelden bij elkaar is 365 (dagen). 
-4) Vul de aantal verwachte dagen in met hoog/gemiddeld/laag luchtvochtigheid in de luchtvochtigheidsvelden. De maximale waarden van alle luchtvochtigheidsvelden bij elkaar is 365 (dagen).
-5) Vul de verwachte neerslag in van de geselecteerde jaar in mm per jaar.
+3) Vul de aantal verwachte dagen in met windrichtingen in de windrichtingsvelden. De totaal aantal dagen bij windrichtingen moet gelijk zijn aan de totaal aantal dagen bij de windkrachten.
+   De maximale waarde van alle windrichtingsvelden bij elkaar is 365 (dagen). 
+4) Vul de aantal verwachte dagen in met hoog/gemiddeld/laag luchtvochtigheid in de luchtvochtigheidsvelden. De totaal aantal dagen bij luchtvochtigheid moet gelijk zijn aan de totaal aantal dagen bij de windkrachten.
+   De maximale waarden van alle luchtvochtigheidsvelden bij elkaar is 365 (dagen).
+5) Vul de verwachte neerslag in van het geselecteerde jaar in mm per jaar.
 
 Stap 3. Voorspellen
 Wanneer alle velden ingevuld zijn en u een csv-bestand hebt geupload kunt u op de knop 'voorspellen' klikken. Wacht enkele seconden voor de applicatie om de model toe te passen voor het voorspellen van de duingroei.

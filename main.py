@@ -161,10 +161,12 @@ class Mainscreen(ttk.Frame):
         #Create help page window
         def helppage(root):
             if self.helppageactived == False:
-                helpWindow = Toplevel(root)
+                helpWindow = Toplevel(root, bg=backgroundcolor)
                 helpWindow.title("Hulppagina")
                 helpWindow.geometry("700x600")
-                Label(helpWindow,text ="Tekst voor hulppagina komt hier.").pack()
+                with open('helppage.txt') as f:
+                    contents = f.read()
+                Label(helpWindow,text = contents,anchor='nw',justify=LEFT,bg="white",font=('calibre',10)).pack()
                 self.helppageactived = True
                 self.helppage = helpWindow
                 helpWindow.protocol("WM_DELETE_WINDOW", on_closing)

@@ -127,7 +127,7 @@ class PageOne(tk.Frame):
                             command=lambda: [controller.show_frame(StartPage), start_page.csvTable.place(height=450,width=800,x = 400, y = 350)])
         button1.pack()
 
-        f = Figure(figsize=(10,5), dpi=100)
+        f = Figure(figsize=(5,5), dpi=100)
         a = f.add_subplot(111)
         a.plot([1,2,3,4,5,6,7,8],[5,6,7,3,4,5,6,9])
 

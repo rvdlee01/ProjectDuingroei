@@ -481,8 +481,18 @@ def clearGraphpage(canvas):
     for item in canvas.get_tk_widget().find_all():
         canvas.get_tk_widget().delete(item)
 
+def hideGraph(canvas,graph,histogram, showbarplot):
+    if(graph.get_visible()):
+        graph.set_visible(False)
+        histogram.set_visible(True)
+        showbarplot["text"]="Laat grafiek zien"
+    else:
+        histogram.set_visible(False)
+        graph.set_visible(True)
+        showbarplot["text"]="Laat histogram zien"
+    canvas.draw()
 
-def plotGraph(a,f,canvas,startpage,tv2,csvTable2):
+def plotGraph(a,b,f,canvas,startpage,tv2,csvTable2):
     start_page = startpage
     inputX = pd.DataFrame(columns=['jaar']+xcolumnnames)
     inputX.loc[0] = [start_page.year.get(),start_page.wp6.get(),start_page.wp7.get(),start_page.wp8.get(),start_page.wp9.get(),start_page.wp10.get(),start_page.wp11.get(),start_page.wp12.get(),start_page.north.get(),start_page.east.get(),
@@ -496,14 +506,54 @@ def plotGraph(a,f,canvas,startpage,tv2,csvTable2):
     userOutputx, userOutputy = convertToList(years[listOfDataset.shape[0]:listOfDataset.shape[0]+1], inputPredict)
 
     a.clear()
-    a.plot(datasetPredictedx, datasetPredictedy,label="dataset predicted values",color='green')
-    a.plot(datasetActualx, datasetActualy,label="dataset actual values",color='purple')
-    a.scatter(userOutputx,userOutputy,label="predicted user input",color='blue')
+    a.plot(datasetPredictedx, datasetPredictedy,label='Voorspelde waarde',color='lightsalmon')
+    a.plot(datasetActualx, datasetActualy,label='Daadwerkelijke waarde',color='turquoise')
+    a.scatter(userOutputx,userOutputy,label='Voorspelde invoergegevens van gebruiker',color='royalblue')
 
     a.legend()
     a.set_xlabel('jaar',labelpad=10)
     a.set_ylabel('duinhoogte [cm]',labelpad=10)
     
+    actualY = []
+    predictedX = []
+
+    for i in datasetActualy:
+        actualY.append(i[0])
+    for i in datasetPredictedy:
+        predictedX.append(i[0])
+
+    barWidth = 0.4
+    
+    # set heights of bars
+    actualY.append(0) # add extra value for 2021 not visible
+    predictedX.append(0)
+
+    bars1 = actualY
+    bars2 = predictedX
+
+    user_input_list = []
+    for i in datasetActualx:
+        user_input_list.append(0)
+    user_input_list.append(userOutputy[0][0])
+
+    bars3 = user_input_list
+    
+    # Set position of bar on X axis
+    r1 = OutputDataframe["Jaar"]
+    r2 = [x + barWidth for x in r1]
+    r3 = [x + barWidth for x in r2]
+
+    # Make the plot
+    b.bar(r1, bars1, color='turquoise', width=barWidth, edgecolor='white', label='Daadwerkelijke waarde')
+    b.bar(r2, bars2, color='lightsalmon', width=barWidth, edgecolor='white', label='Voorspelde waarde')
+    b.bar(r3, bars3, color='royalblue', width=barWidth, edgecolor='white', label='Voorspelde invoergegevens van gebruiker')
+    
+    # Create legend
+    b.set_xlabel('jaar',labelpad=10)
+    b.set_ylabel('duinhoogte [cm]',labelpad=10)
+    b.legend()
+    b.set_visible(False)
+
     canvas.draw()
     canvas.get_tk_widget().grid(pady=25,row=2,columnspan=3)
 
@@ -559,6 +609,7 @@ class GraphPage(ttk.Frame):
 
         f = Figure(figsize=(10,5), dpi=100)
         a = f.add_subplot(111)
+        b = f.add_subplot(111)
         canvas = FigureCanvasTkAgg(f, second_frame)
 
         # Frame for Treeview
@@ -574,7 +625,7 @@ class GraphPage(ttk.Frame):
         treescrollx.pack(side="bottom", fill="x")
         treescrolly.pack(side="right", fill="y")
 
-        OutputDataframe = plotGraph(a,f,canvas,start_page,tv2,csvTable2)
+        OutputDataframe = plotGraph(a,b,f,canvas,start_page,tv2,csvTable2)
 
         homebutton = Button(second_frame,state = NORMAL, text="Terug naar startpagina", width=18, bg=buttoncolour,
                             command=lambda: [my_canvas.pack_forget(),csvTable2.grid_forget(),canvas.get_tk_widget().pack_forget(),clearGraphpage(canvas),my_scrollbar.pack_forget(),plot_frame.pack_forget(),Mainscreen(container)])
@@ -596,6 +647,13 @@ class GraphPage(ttk.Frame):
         
         downloadcsv.bind("<Enter>", lambda e: on_enter(e, hovercolour))
         downloadcsv.bind("<Leave>", lambda e: on_leave(e, buttoncolour))
+
+        showbarplot = Button(second_frame,state = NORMAL, text="Laat histogram zien", width=18, bg=buttoncolour,
+                            command=lambda: [hideGraph(canvas,a,b, showbarplot)])
+        showbarplot.grid(padx=10,ipady=5,row=1,column=3)
+
+        showbarplot.bind("<Enter>", lambda e: on_enter(e, hovercolour))
+        showbarplot.bind("<Leave>", lambda e: on_leave(e, buttoncolour))
 
         def getAccuracy(OutputDataframe):
             acc = []

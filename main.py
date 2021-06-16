@@ -418,7 +418,7 @@ class Mainscreen(ttk.Frame):
                     if (boolYear):
                         df = df.sort_values(by=['jaar'])
                 else:
-                    boolYear,missingyears = False, "Kolomnamen moeten overeenkomen met de vereiste kolomnamen voordat de 'jaar' kolom gecheckt kan worden!"
+                    boolYear,missingyears = False, "Het bestand bevat geen kolom 'jaar'"
                     
                 #clear treeview
                 for row in tv1.get_children():
@@ -439,7 +439,10 @@ class Mainscreen(ttk.Frame):
                 boolColumns = checkColumnNames(check_list, list_of_column_names)
                 boolRows = checkRows(csv_data)
                 boolValues = checkValues(df)
-                lastyear = df['jaar'].iloc[-1]
+                if 'jaar' in df:
+                    lastyear = df['jaar'].iloc[-1]
+                else:
+                    lastyear = ""
                 #detect outliers
                 #outliers = detect_outlier(df['duinhoogte'])
                 #print('outliers: ', outliers)

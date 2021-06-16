@@ -587,7 +587,7 @@ def plotGraph(a,b,f,canvas,startpage,tv2,csvTable2):
     b.set_visible(False)
 
     canvas.draw()
-    canvas.get_tk_widget().grid(pady=25,row=2,columnspan=3)
+    canvas.get_tk_widget().grid(pady=15,row=2,columnspan=3, sticky="n")
     
     for i in tv2.get_children():
         tv2.delete(i)
@@ -657,7 +657,7 @@ class GraphPage(ttk.Frame):
                            )
                        )
 
-        f = Figure(figsize=(10,5), dpi=100)
+        f = Figure(figsize=(10,7), dpi=100)
         a = f.add_subplot(111)
         b = f.add_subplot(111)
         canvas = FigureCanvasTkAgg(f, second_frame)
@@ -686,33 +686,33 @@ class GraphPage(ttk.Frame):
             if homemssge == 'yes':
                 my_canvas.pack_forget(),csvTable2.grid_forget(),canvas.get_tk_widget().pack_forget(),clearGraphpage(canvas),my_scrollbar.pack_forget(),plot_frame.pack_forget(),Mainscreen(container)
 
-        homebutton = Button(second_frame,state = NORMAL, text="Terug naar startpagina", width=30, height=2, bg=buttoncolour,
+        homebutton = Button(second_frame,state = NORMAL, text="Terug naar startpagina", width=18, height=2, bg=sandycolour,
                             command=lambda: ExitGraphpage())
-        homebutton.grid(padx=10,pady=15,ipady=5,row=0,column=1)
+        homebutton.grid(padx=10,pady=15,ipadx=1,ipady=5,row=0,column=0)
         
-        homebutton.bind("<Enter>", lambda e: on_enter(e, hovercolour))
-        homebutton.bind("<Leave>", lambda e: on_leave(e, buttoncolour))
+        homebutton.bind("<Enter>", lambda e: on_enter(e, goldcolour))
+        homebutton.bind("<Leave>", lambda e: on_leave(e, sandycolour))
 
-        downloadgraph = Button(second_frame,state = NORMAL, text="Download grafiek", width=18, bg=buttoncolour,
+        downloadgraph = Button(second_frame,state = NORMAL, text="Download grafiek", width=18, height=2, bg=orangecolour,
                             command=lambda: [saveGraph(f,a,b,hashCodeLineGraph,hashCodeHistoGraph)])
-        downloadgraph.grid(padx=10,ipady=5,row=1,column=0)
+        downloadgraph.grid(padx=5,ipady=5,row=0,column=5)
         
         downloadgraph.bind("<Enter>", lambda e: on_enter(e, hovercolour))
-        downloadgraph.bind("<Leave>", lambda e: on_leave(e, buttoncolour))
+        downloadgraph.bind("<Leave>", lambda e: on_leave(e, orangecolour))
 
-        downloadcsv = Button(second_frame,state = NORMAL, text="Download CSV", width=18, bg=buttoncolour,
+        downloadcsv = Button(second_frame,state = NORMAL, text="Download CSV", width=18, height=2, bg=orangecolour,
                             command=lambda: [OutputDataframe.to_csv('downloads/PredictedOutputs{}.csv'.format(hashCodeCSV), index=False), messagebox.showinfo("Download succes", "Bestand opgeslagen in: downloads/PredictedOutputs{}.csv in de applicatie folder".format(hashCodeCSV))])
-        downloadcsv.grid(padx=10,ipady=5,row=1,column=2)
+        downloadcsv.grid(padx=5,ipady=5,row=0,column=4)
         
         downloadcsv.bind("<Enter>", lambda e: on_enter(e, hovercolour))
-        downloadcsv.bind("<Leave>", lambda e: on_leave(e, buttoncolour))
+        downloadcsv.bind("<Leave>", lambda e: on_leave(e, orangecolour))
 
-        showbarplot = Button(second_frame,state = NORMAL, text="Laat histogram zien", width=30, height=2, bg=buttoncolour,
+        showbarplot = Button(second_frame,state = NORMAL, text="Laat histogram zien", width=25, height=2, bg=orangecolour,
                             command=lambda: [hideGraph(canvas,a,b, showbarplot)])
-        showbarplot.grid(padx=10,ipady=5,row=1,column=3)
+        showbarplot.grid(padx=5,ipady=5,row=0,column=3)
 
         showbarplot.bind("<Enter>", lambda e: on_enter(e, hovercolour))
-        showbarplot.bind("<Leave>", lambda e: on_leave(e, buttoncolour))
+        showbarplot.bind("<Leave>", lambda e: on_leave(e, orangecolour))
 
         def getAccuracy(OutputDataframe):
             acc = []
@@ -757,7 +757,7 @@ class GraphPage(ttk.Frame):
             elif value == 'precipitation':
                 # Precipitation
                 labelText += "Neerslag in een jaar: " + getattr(start_page,value).get() + "\n\n"
-        setattr(self,'input_label',Label(second_frame, text = labelText, font=labelfont, bg=backgroundcolour, justify=LEFT).grid(padx=30,row=rownumber,column=3,sticky="w"))
+        setattr(self,'input_label',Label(second_frame, text = labelText, font=labelfont, bg=backgroundcolour, justify=LEFT).grid(row=rownumber,column=3, columnspan=3))
 
             
 def main():

@@ -160,12 +160,12 @@ class Mainscreen(ttk.Frame):
 
         predictbutton = Button(second_frame, text="Voorspellen", width=18, height=2, bg=hovercolour,
                             command=lambda: checkInputs())
-        predictbutton.grid(row=0,column=2,padx=10,pady=15,ipady=5)
+        predictbutton.grid(row=0,column=3,padx=10,pady=15,ipady=5)
         predictbutton.bind("<Enter>", lambda e: on_enter(e, bluecolour))
         predictbutton.bind("<Leave>", lambda e: on_leave(e, hovercolour))
         uploadbutton = Button(second_frame, text="CSV bestand selecteren", width=18, height=2, bg=sandycolour,
                             command=lambda: getCsvFile(uploadbutton, predictbutton, tv1))
-        uploadbutton.grid(row=0,column=1,padx=10,pady=15,ipady=5)
+        uploadbutton.grid(row=0,column=2,padx=10,pady=15,ipady=5)
         uploadbutton.bind("<Enter>", lambda e: on_enter(e, goldcolour))
         uploadbutton.bind("<Leave>", lambda e: on_leave(e, sandycolour))
 
@@ -227,7 +227,7 @@ class Mainscreen(ttk.Frame):
         self.helppageactived = False
         self.helppage = None
         helpbutton = Button(second_frame, text ="Hulp nodig?", bg=orangecolour, width=18, height=2, command = lambda: [helppage(container)])
-        helpbutton.grid(row=0,column=3,padx=10,pady=15,ipady=5)
+        helpbutton.grid(row=0,column=5,padx=10,pady=15,ipady=5)
         helpbutton.bind("<Enter>", lambda e: on_enter(e, salmoncolour))
         helpbutton.bind("<Leave>", lambda e: on_leave(e, orangecolour))
         

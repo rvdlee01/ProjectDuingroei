@@ -724,6 +724,41 @@ class GraphPage(ttk.Frame):
         #label accuracy
         accuracyLabel = Label(second_frame, text="Nauwkeurigheid van model: "+str(getAccuracy(OutputDataframe))+"%", bg=backgroundcolour,font=('calibre',12, 'bold'))
         accuracyLabel.grid(padx=10,pady=5,row=1,column=1)
+
+
+        listOfInputVariables = ['year','wp6','wp7','wp8','wp9','wp10','wp11','wp12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','avghumidity','precipitation']
+        listOfWP = ['wp6','wp7','wp8','wp9','wp10','wp11','wp12']
+        dictOfDirections = {'north':'noorden','east':'oosten','south':'zuiden','west':'westen','northeast':'noord-oosten','southeast':'zuid-oosten','southwest':'zuid-westen','northwest':'noord-westen'}
+        dictOfHumidity = {'highhumidity': 'hoge luchtvochtigheid','lowhumidity':'lage luchtvochtigheid','avghumidity': 'gemiddelde luchtvochtigheid'}
+
+        rownumber = 2
+        count = 6
+        labelText = ""
+        for value in listOfInputVariables:
+            if value == 'year':
+                # Year 
+                labelText += 'Jaar: ' + getattr(start_page,value).get() + "\n\n"
+            elif 'wp' in value:
+                # Wind power 
+                labelText += 'Aantal dagen met windkracht ' + str(count) + ": "+ getattr(start_page,value).get() + "\n\n"
+                count += 1
+            elif value in dictOfDirections.keys():
+                # Wind direction 
+                for k, v in dictOfDirections.items():
+                    if k == value:
+                        textInputWD = 'Aantal dagen met wind vanuit het ' + v + ": "
+                        labelText += textInputWD + getattr(start_page,value).get() + "\n\n"
+            elif value in dictOfHumidity.keys():
+                # Humidity
+                for k, v in dictOfHumidity.items():
+                    if k == value:
+                        textInputH = 'Aantal dagen met een ' + v + ": "
+                        labelText += textInputH + getattr(start_page,value).get() + "\n\n"
+            elif value == 'precipitation':
+                # Precipitation
+                labelText += "Neerslag in een jaar: " + getattr(start_page,value).get() + "\n\n"
+        setattr(self,'input_label',Label(second_frame, text = labelText, font=labelfont, bg=backgroundcolour, justify=LEFT).grid(padx=30,row=rownumber,column=3,sticky="w"))
+
             
 def main():
     root = tk.Tk()

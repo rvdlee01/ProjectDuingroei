@@ -513,15 +513,17 @@ def clearGraphpage(canvas):
     for item in canvas.get_tk_widget().find_all():
         canvas.get_tk_widget().delete(item)
 
-def hideGraph(canvas,graph,histogram, showbarplot):
+def hideGraph(canvas,graph,histogram, showbarplot,downloadgraph):
     if(graph.get_visible()):
         graph.set_visible(False)
         histogram.set_visible(True)
         showbarplot["text"]="Laat grafiek zien"
+        downloadgraph["text"]="Download histogram"
     else:
         histogram.set_visible(False)
         graph.set_visible(True)
         showbarplot["text"]="Laat histogram zien"
+        downloadgraph["text"]="Download grafiek"
     canvas.draw()
     
 def plotGraph(a,b,f,canvas,startpage,tv2,csvTable2):
@@ -576,8 +578,8 @@ def plotGraph(a,b,f,canvas,startpage,tv2,csvTable2):
     r3 = [x + barWidth for x in r2]
 
     # Make the plot
-    b.bar(r1, bars1, color='turquoise', width=barWidth, edgecolor='white', label='Daadwerkelijke waarde')
     b.bar(r2, bars2, color='lightsalmon', width=barWidth, edgecolor='white', label='Voorspelde waarde')
+    b.bar(r1, bars1, color='turquoise', width=barWidth, edgecolor='white', label='Daadwerkelijke waarde')
     b.bar(r3, bars3, color='royalblue', width=barWidth, edgecolor='white', label='Voorspelde invoergegevens van gebruiker')
     b.set_ylim([0,2000])
     # Create legend
@@ -616,11 +618,11 @@ def plotGraph(a,b,f,canvas,startpage,tv2,csvTable2):
 def saveGraph(fig,lineGraph,histoGraph,hashCodeLineGraph,hashCodeHistoGraph):
     if (lineGraph.get_visible()):
         extent = lineGraph.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
-        fig.savefig('downloads/duingroeivoorspelling{}.png'.format(hashCodeLineGraph),bbox_inches=extent,dpi=100)
+        fig.savefig('downloads/duingroeivoorspelling{}.png'.format(hashCodeLineGraph),dpi=100)
         messagebox.showinfo("Download succes", "Bestand opgeslagen in: downloads/duingroeivoorspelling{}.png in de applicatie folder".format(hashCodeLineGraph))
     else:
         extent = histoGraph.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
-        fig.savefig('downloads/duingroeivoorspelling{}.png'.format(hashCodeHistoGraph),bbox_inches=extent,dpi=100)
+        fig.savefig('downloads/duingroeivoorspelling{}.png'.format(hashCodeHistoGraph),dpi=100)
         messagebox.showinfo("Download succes", "Bestand opgeslagen in: downloads/duingroeivoorspelling{}.png in de applicatie folder".format(hashCodeHistoGraph))
 
 class GraphPage(ttk.Frame):
@@ -708,7 +710,7 @@ class GraphPage(ttk.Frame):
         downloadcsv.bind("<Leave>", lambda e: on_leave(e, orangecolour))
 
         showbarplot = Button(second_frame,state = NORMAL, text="Laat histogram zien", width=25, height=2, bg=orangecolour,
-                            command=lambda: [hideGraph(canvas,a,b, showbarplot)])
+                            command=lambda: [hideGraph(canvas,a,b, showbarplot, downloadgraph)])
         showbarplot.grid(padx=5,ipady=5,row=0,column=3)
 
         showbarplot.bind("<Enter>", lambda e: on_enter(e, hovercolour))

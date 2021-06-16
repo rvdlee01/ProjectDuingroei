@@ -32,8 +32,8 @@ ycolumnname = 'duinhoogte'
 hovercolour = "LightBlue2"
 buttoncolour = "snow"
 bluecolour = "DeepSkyBlue2"
-salmoncolour = "salmon"
-orangecolour = "orange"
+salmoncolour = "orange"
+orangecolour = "gold"
 goldcolour = "plum3"
 sandycolour = "plum1"
 

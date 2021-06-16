@@ -254,7 +254,7 @@ class Mainscreen(ttk.Frame):
                     P == '' or float(P) >= 0
                     return True
                 except:
-                    messagebox.showerror("Error", "Vul een geldig numerieke waarde in")
+                    messagebox.showerror("Foutmelding", "Vul een geldig numerieke waarde in")
                     return False
             if (str.isdigit(P) and (sumTotal <= 365 and sumTotal >= 0)) or P == '':
                 return True
@@ -267,7 +267,7 @@ class Mainscreen(ttk.Frame):
                     message = "De maximale waarde van alle windrichting velden is 365."
                 elif var in dictOfHumidity.keys():
                     message = "De maximale waarde van alle luchtvochtigheidsvelden is 365."                
-                messagebox.showerror("Error", message)
+                messagebox.showerror("Foutmelding", message)
 
                 return False
             
@@ -361,16 +361,16 @@ class Mainscreen(ttk.Frame):
                 my_canvas.pack_forget(), GraphPage(container, self),my_scrollbar.pack_forget(),main_frame.pack_forget()
             else:
                 if(filename == ''):
-                    messagebox.showerror("Error", "Selecteer eerst een CSV bestand en vul vervolgens de onderstaande velden in!")
+                    messagebox.showerror("Foutmelding", "Selecteer eerst een CSV bestand en vul vervolgens de onderstaande velden in!")
                 elif((boolInputs == False) or (boolSelectedYear == False)):
                     if((boolInputs == False) and (boolSelectedYear != False)):
-                        messagebox.showerror("Error", "Vul eerst alle velden in!")
+                        messagebox.showerror("Foutmelding", "Vul eerst alle velden in!")
                     elif((boolInputs != False) and (boolSelectedYear == False)):
-                        messagebox.showerror("Error", "Selecteer eerst een jaar voor de voorspelling!")
+                        messagebox.showerror("Foutmelding", "Selecteer eerst een jaar voor de voorspelling!")
                     else:
-                        messagebox.showerror("Error", "Vul eerst alle velden in en selecteer een jaar voor de voorspelling!")
+                        messagebox.showerror("Foutmelding", "Vul eerst alle velden in en selecteer een jaar voor de voorspelling!")
                 elif(sumOfWP != sumOfDirections or sumOfWP != sumOfHumidity):
-                    messagebox.showerror("Error", "De totaal aantal dagen komen niet met elkaar overeen!\nTotaal aantal dagen bij windkrachten: " + str(sumOfWP)
+                    messagebox.showerror("Foutmelding", "De totaal aantal dagen komen niet met elkaar overeen!\nTotaal aantal dagen bij windkrachten: " + str(sumOfWP)
                                          + "\nTotaal aantal dagen bij windrichtingen: " + str(sumOfDirections) + "\nTotaal aantal dagen bij luchtvochtigheid: " + str(sumOfHumidity))
 
         def checkColumnNames(checklist, csv_columns):
@@ -472,7 +472,7 @@ class Mainscreen(ttk.Frame):
                         csvErrorMessage += "Er ontbreken gegevens!\n"
                     if(boolYear == False):
                         csvErrorMessage += missingyears
-                    messagebox.showerror("Error", csvErrorMessage)
+                    messagebox.showerror("Foutmelding", csvErrorMessage)
                 if ((boolColumns == True) and (boolRows == True) and (boolValues == True) and (boolYear == True)):
                     for inputfield in listOfInputVariables:
                         getattr(self, 'entry'+inputfield)["state"] = NORMAL
@@ -481,6 +481,7 @@ class Mainscreen(ttk.Frame):
                     selectbox['menu'].delete(0,'end')
                     options = (lastyear + 1)
                     selectbox['menu'].add_command(label=options, command=tk._setit(getattr(self,'year'), options))
+                    messagebox.showinfo("Bevestiging", "CSV bestand succesvol geupload")
 
 def clearGraphpage(canvas):
     for item in canvas.get_tk_widget().find_all():
@@ -640,14 +641,14 @@ class GraphPage(ttk.Frame):
         homebutton.bind("<Leave>", lambda e: on_leave(e, buttoncolour))
 
         downloadgraph = Button(second_frame,state = NORMAL, text="Download grafiek", width=18, bg=buttoncolour,
-                            command=lambda: [f.savefig('downloads/duingroeivoorspelling.png', dpi=100)])
+                            command=lambda: [f.savefig('downloads/duingroeivoorspelling.png', dpi=100), messagebox.showinfo("Download success", "File saved to: downloads/duingroeivoorspelling.png in the application folder")])
         downloadgraph.grid(padx=10,ipady=5,row=1,column=0)
         
         downloadgraph.bind("<Enter>", lambda e: on_enter(e, hovercolour))
         downloadgraph.bind("<Leave>", lambda e: on_leave(e, buttoncolour))
 
-        downloadcsv = Button(second_frame,state = NORMAL, text="Download csv", width=18, bg=buttoncolour,
-                            command=lambda: [OutputDataframe.to_csv('downloads/PredictedOutputs.csv', index=False)])
+        downloadcsv = Button(second_frame,state = NORMAL, text="Download CSV", width=18, bg=buttoncolour,
+                            command=lambda: [OutputDataframe.to_csv('downloads/PredictedOutputs.csv', index=False), messagebox.showinfo("Download success", "File saved to: downloads/PredictedOutputs.csv in the application folder")])
         downloadcsv.grid(padx=10,ipady=5,row=1,column=2)
         
         downloadcsv.bind("<Enter>", lambda e: on_enter(e, hovercolour))

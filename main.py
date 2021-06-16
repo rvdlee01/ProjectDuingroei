@@ -180,7 +180,7 @@ class Mainscreen(ttk.Frame):
 
                 help_frame_n_canvas_id = helpCanvas.create_window((0,0), window=help_second_frame, anchor = "nw")
 
-                helpCanvas.bind_all("<MouseWheel>",lambda event: helpCanvas.yview_scroll(int(-1*(event.delta/120)), "units"))
+                helpCanvas.bind("<MouseWheel>",lambda event: helpCanvas.yview_scroll(int(-1*(event.delta/120)), "units"))
 
                 helpScrollbar = ttk.Scrollbar(help_main_frame, orient=VERTICAL, command=helpCanvas.yview)
                 helpScrollbar.pack(side=RIGHT, fill=Y)

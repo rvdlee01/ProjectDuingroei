@@ -30,9 +30,11 @@ xcolumnnames = ['windkracht6','windkracht7','windkracht8','windkracht9','windkra
 ycolumnname = 'duinhoogte'
 hovercolour = "LightBlue2"
 buttoncolour = "snow"
-bluecolour = "royalblue"
+bluecolour = "DeepSkyBlue2"
 salmoncolour = "salmon"
 orangecolour = "orange"
+goldcolour = "plum3"
+sandycolour = "plum1"
 
 def detect_outlier(data):
     outliers = []
@@ -155,11 +157,11 @@ class Mainscreen(ttk.Frame):
         predictbutton.grid(row=0,column=2,padx=10,pady=15,ipady=5)
         predictbutton.bind("<Enter>", lambda e: on_enter(e, bluecolour))
         predictbutton.bind("<Leave>", lambda e: on_leave(e, hovercolour))
-        uploadbutton = Button(second_frame, text="CSV bestand selecteren", width=18, height=2, bg=buttoncolour,
+        uploadbutton = Button(second_frame, text="CSV bestand selecteren", width=18, height=2, bg=sandycolour,
                             command=lambda: getCsvFile(uploadbutton, predictbutton, tv1))
         uploadbutton.grid(row=0,column=1,padx=10,pady=15,ipady=5)
-        uploadbutton.bind("<Enter>", lambda e: on_enter(e, hovercolour))
-        uploadbutton.bind("<Leave>", lambda e: on_leave(e, buttoncolour))
+        uploadbutton.bind("<Enter>", lambda e: on_enter(e, goldcolour))
+        uploadbutton.bind("<Leave>", lambda e: on_leave(e, sandycolour))
 
         #Close help page window
         def on_closing():
@@ -218,10 +220,10 @@ class Mainscreen(ttk.Frame):
 
         self.helppageactived = False
         self.helppage = None
-        helpbutton = Button(second_frame, text ="Hulp nodig?", bg=salmoncolour, width=18, height=2, command = lambda: [helppage(container)])
+        helpbutton = Button(second_frame, text ="Hulp nodig?", bg=orangecolour, width=18, height=2, command = lambda: [helppage(container)])
         helpbutton.grid(row=0,column=3,padx=10,pady=15,ipady=5)
-        helpbutton.bind("<Enter>", lambda e: on_enter(e, orangecolour))
-        helpbutton.bind("<Leave>", lambda e: on_leave(e, salmoncolour))
+        helpbutton.bind("<Enter>", lambda e: on_enter(e, salmoncolour))
+        helpbutton.bind("<Leave>", lambda e: on_leave(e, orangecolour))
         
         listOfInputVariables = ['year','wp6','wp7','wp8','wp9','wp10','wp11','wp12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','avghumidity','precipitation']
         listOfWP = ['wp6','wp7','wp8','wp9','wp10','wp11','wp12']

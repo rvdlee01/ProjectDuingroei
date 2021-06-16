@@ -64,11 +64,9 @@ def model_NN(filename,inputX):
     
     #predictions
     try:
-        print("try")
         datasetPredict = model.predict(x_dataset)
         inputPredict = model.predict(x_userinput)
     except:
-        print("except")
         exec(open('model.py').read())
         datasetPredict = model.predict(x_dataset)
         inputPredict = model.predict(x_userinput) 

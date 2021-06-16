@@ -635,7 +635,7 @@ class GraphPage(ttk.Frame):
         homebutton.bind("<Leave>", lambda e: on_leave(e, buttoncolour))
 
         downloadgraph = Button(second_frame,state = NORMAL, text="Download grafiek", width=18, bg=buttoncolour,
-                            command=lambda: [f.set_figheight(10),f.set_figwidth(20),f.savefig('downloads/duingroeivoorspelling.png')])
+                            command=lambda: [f.savefig('downloads/duingroeivoorspelling.png', dpi=100)])
         downloadgraph.grid(padx=10,ipady=5,row=1,column=0)
         
         downloadgraph.bind("<Enter>", lambda e: on_enter(e, hovercolour))

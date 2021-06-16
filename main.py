@@ -65,16 +65,15 @@ def model_NN(filename,inputX):
     x_dataset = scaler.fit_transform(x)
     x_userinput = scaler.transform(x_userinput)
     
-    y_dataset = scaler.fit_transform(np.array(y).reshape(-1,1))
-
-    model = keras.models.load_model('model') 
-    
+    y_dataset = scaler.fit_transform(np.array(y).reshape(-1,1)) 
     #predictions
     try:
+        model = keras.models.load_model('model')
         datasetPredict = model.predict(x_dataset)
         inputPredict = model.predict(x_userinput)
     except:
         exec(open('model.py').read())
+        model = keras.models.load_model('model')
         datasetPredict = model.predict(x_dataset)
         inputPredict = model.predict(x_userinput) 
     years = df['jaar'].tolist()

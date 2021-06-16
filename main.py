@@ -38,18 +38,6 @@ orangecolour = "gold"
 goldcolour = "plum3"
 sandycolour = "plum1"
 
-def detect_outlier(data):
-    outliers = []
-    threshold = 3
-    mean = np.mean(data)
-    std = np.std(data)
-    
-    for y in data:
-        z_score = (y - mean)/std 
-        if np.abs(z_score) > threshold:
-            outliers.append(y)
-    return outliers
-
 def model_NN(filename,inputX):
     df = pd.read_csv(filename)
     df = df.sort_values(by=['jaar'])
@@ -108,7 +96,6 @@ def dataframeToCSV(y_dataset, listOfDataset, listOfInput, df, scaler, years, inp
     newDataframe = {'Jaar': years,'Voorspelling': predictedList, 'Daadwerkelijk': actualList, 'Verschil': differences, 'Foutpercentage': errorrates}
     #create dataframe
     OutputDataframe = pd.DataFrame(newDataframe)
-    print(OutputDataframe)
     return OutputDataframe
 
 def convertToList(arrayX, arrayY):
@@ -468,9 +455,6 @@ class Mainscreen(ttk.Frame):
                     lastyear = df['jaar'].iloc[-1]
                 else:
                     lastyear = ""
-                #detect outliers
-                #outliers = detect_outlier(df['duinhoogte'])
-                #print('outliers: ', outliers)
                 return boolColumns, boolRows, boolValues, boolYear, missingyears, lastyear
             except:
                 uploadbutton.configure(bg="red", activebackground=hovercolour)
@@ -533,7 +517,6 @@ def plotGraph(a,b,f,canvas,startpage,tv2,csvTable2):
                 ,start_page.avghumidity.get(),start_page.precipitation.get()]
             
     df, y_dataset, listOfDataset, inputPredict, years, OutputDataframe = model_NN(filename,inputX)
-    print('prediction of userinput: ', inputPredict)
     datasetActualx, datasetActualy = convertToList(years[:listOfDataset.shape[0]], y_dataset)
     datasetPredictedx, datasetPredictedy = convertToList(years[:listOfDataset.shape[0]], listOfDataset)
     userOutputx, userOutputy = convertToList(years[listOfDataset.shape[0]:listOfDataset.shape[0]+1], inputPredict)

@@ -681,15 +681,19 @@ class GraphPage(ttk.Frame):
 
         OutputDataframe = plotGraph(a,b,f,canvas,start_page,tv2,csvTable2)
 
+        def ExitGraphpage():
+            homemssge = tk.messagebox.askquestion('Waarschuwing','Weet u zeker dat u terug naar de startpagina wilt? Uw gegevens worden dan verwijderd.',icon = 'warning')
+            if homemssge == 'yes':
+                my_canvas.pack_forget(),csvTable2.grid_forget(),canvas.get_tk_widget().pack_forget(),clearGraphpage(canvas),my_scrollbar.pack_forget(),plot_frame.pack_forget(),Mainscreen(container)
+
         homebutton = Button(second_frame,state = NORMAL, text="Terug naar startpagina", width=30, height=2, bg=buttoncolour,
-                            command=lambda: [my_canvas.pack_forget(),csvTable2.grid_forget(),canvas.get_tk_widget().pack_forget(),clearGraphpage(canvas),my_scrollbar.pack_forget(),plot_frame.pack_forget(),Mainscreen(container)])
+                            command=lambda: ExitGraphpage())
         homebutton.grid(padx=10,pady=15,ipady=5,row=0,column=1)
         
         homebutton.bind("<Enter>", lambda e: on_enter(e, hovercolour))
         homebutton.bind("<Leave>", lambda e: on_leave(e, buttoncolour))
 
         downloadgraph = Button(second_frame,state = NORMAL, text="Download grafiek", width=18, bg=buttoncolour,
-                               #f.savefig('downloads/duingroeivoorspelling{}.png'.format(hashCodeGraph)
                             command=lambda: [saveGraph(f,a,b,hashCodeLineGraph,hashCodeHistoGraph)])
         downloadgraph.grid(padx=10,ipady=5,row=1,column=0)
         

@@ -446,6 +446,8 @@ class Mainscreen(ttk.Frame):
                 return boolColumns, boolRows, boolValues, boolYear, missingyears, lastyear
             except:
                 tk.messagebox.showerror("Error", "Ongeldig bestand")
+                uploadbutton.configure(bg="red", activebackground=hovercolour)
+                uploadbutton.bind("<Leave>", lambda e: on_enter(e, "red"))
             return None
 
         def getCsvFile(uploadbutton, predictbutton, tv1): #treeview, buttons

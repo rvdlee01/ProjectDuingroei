@@ -83,26 +83,3 @@ als een csv-bestand.
 	Download optie 1: download grafiek als een png afbeelding
 	Download optie 2: download tabel als een csv-bestand
 2) U kunt de gedownloade bestand in de folder vinden van waar de applicatie zit.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

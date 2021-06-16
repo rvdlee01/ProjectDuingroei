@@ -601,7 +601,7 @@ def plotGraph(a,b,f,canvas,startpage,tv2,csvTable2):
     for row in df_rows:
         row[-1] = round(row[-1],1)
         for i in row:
-            if(count < 2):
+            if(count < 3):
                 row[count] = int(i)
                 count+=1
         count = 0

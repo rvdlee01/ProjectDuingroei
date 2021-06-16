@@ -440,9 +440,22 @@ class Mainscreen(ttk.Frame):
                 for column in tv1["columns"]:
                     tv1.heading(column, text=column)
                 
+                indexNeerslag = 0
+                for col in df.columns:
+                    if('neerslag' in col):
+                        break
+                    indexNeerslag+=1
+                
+                count = 0
                 df_rows = df.to_numpy().tolist()
                 for row in df_rows:
+                    for i in row:
+                        if(count != indexNeerslag):
+                            row[count] = int(i)
+                            count+=1
+                    count = 0
                     tv1.insert("", "end", values=row)
+
                 # list with column names of user
                 list_of_column_names = list(df.columns)
                 check_list = ['jaar', ycolumnname] + xcolumnnames
@@ -582,9 +595,16 @@ def plotGraph(a,b,f,canvas,startpage,tv2,csvTable2):
     tv2["show"] = "headings"
     for column in tv2["columns"]:
         tv2.heading(column, text=column)
-            
+    
+    count = 0
     df_rows = OutputDataframe.to_numpy().tolist()
     for row in df_rows:
+        row[-1] = round(row[-1],1)
+        for i in row:
+            if(count < 2):
+                row[count] = int(i)
+                count+=1
+        count = 0
         tv2.insert("", "end", values=row)
 
     csvTable2.grid(ipadx=400,ipady=250, pady=25,row=3,columnspan=3)

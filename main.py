@@ -2,6 +2,7 @@ from tkinter.constants import DISABLED
 import matplotlib
 matplotlib.use("TkAgg")
 import pandas as pd
+import uuid
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from matplotlib.figure import Figure
@@ -506,7 +507,7 @@ def hideGraph(canvas,graph,histogram, showbarplot):
         graph.set_visible(True)
         showbarplot["text"]="Laat histogram zien"
     canvas.draw()
-
+    
 def plotGraph(a,b,f,canvas,startpage,tv2,csvTable2):
     start_page = startpage
     inputX = pd.DataFrame(columns=['jaar']+xcolumnnames)
@@ -588,6 +589,15 @@ def plotGraph(a,b,f,canvas,startpage,tv2,csvTable2):
 
     return OutputDataframe
 
+def saveGraph(fig,lineGraph,histoGraph,hashCodeLineGraph,hashCodeHistoGraph):
+    if (lineGraph.get_visible()):
+        extent = lineGraph.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
+        fig.savefig('downloads/duingroeivoorspelling{}.png'.format(hashCodeLineGraph),bbox_inches=extent,dpi=100)
+    else:
+        extent = histoGraph.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
+        fig.savefig('downloads/duingroeivoorspelling{}.png'.format(hashCodeHistoGraph),bbox_inches=extent,dpi=100)
+    messagebox.showinfo("Download succes", "Bestand opgeslagen in: downloads/duingroeivoorspelling{}.png in de applicatie folder".format)
+
 class GraphPage(ttk.Frame):
     def __init__(self, container, start_page, *args, **kwargs):
         super().__init__(container, *args, **kwargs)
@@ -640,6 +650,9 @@ class GraphPage(ttk.Frame):
         treescrollx.pack(side="bottom", fill="x")
         treescrolly.pack(side="right", fill="y")
 
+        hashCodeLineGraph = uuid.uuid4().hex
+        hashCodeHistoGraph = uuid.uuid4().hex
+
         OutputDataframe = plotGraph(a,b,f,canvas,start_page,tv2,csvTable2)
 
         homebutton = Button(second_frame,state = NORMAL, text="Terug naar startpagina", width=30, height=2, bg=buttoncolour,
@@ -649,17 +662,16 @@ class GraphPage(ttk.Frame):
         homebutton.bind("<Enter>", lambda e: on_enter(e, hovercolour))
         homebutton.bind("<Leave>", lambda e: on_leave(e, buttoncolour))
 
-
-        downloadgraph = Button(second_frame,state = NORMAL, text="Download grafiek", width=30, height=2, bg=buttoncolour,
-                            command=lambda: [f.savefig('downloads/duingroeivoorspelling.png', dpi=100), messagebox.showinfo("Download successvol", "Bestand opgeslagen naar: downloads/duingroeivoorspelling.png in de application folder")])
-
+        downloadgraph = Button(second_frame,state = NORMAL, text="Download grafiek", width=18, bg=buttoncolour,
+                               #f.savefig('downloads/duingroeivoorspelling{}.png'.format(hashCodeGraph)
+                            command=lambda: [saveGraph(f,a,b,hashCodeLineGraph,hashCodeHistoGraph)])
         downloadgraph.grid(padx=10,ipady=5,row=1,column=0)
         
         downloadgraph.bind("<Enter>", lambda e: on_enter(e, hovercolour))
         downloadgraph.bind("<Leave>", lambda e: on_leave(e, buttoncolour))
 
-        downloadcsv = Button(second_frame,state = NORMAL, text="Download CSV", width=30, height=2, bg=buttoncolour,
-                            command=lambda: [OutputDataframe.to_csv('downloads/PredictedOutputs.csv', index=False), messagebox.showinfo("Download successvol", "Bestand opgeslagen naar: downloads/PredictedOutputs.csv in de applicatie folder")])
+        downloadcsv = Button(second_frame,state = NORMAL, text="Download CSV", width=18, bg=buttoncolour,
+                            command=lambda: [OutputDataframe.to_csv('downloads/PredictedOutputs.csv', index=False), messagebox.showinfo("Download succes", "Bestand opgeslagen in: downloads/PredictedOutputs.csv in de applicatie folder")])
         downloadcsv.grid(padx=10,ipady=5,row=1,column=2)
         
         downloadcsv.bind("<Enter>", lambda e: on_enter(e, hovercolour))

@@ -718,7 +718,7 @@ class GraphPage(ttk.Frame):
             return round(accuracy*100,2)
     
         #label accuracy
-        accuracyLabel = Label(second_frame, text="Nauwkeurigheid van model: "+str(getAccuracy(OutputDataframe))+"%", bg=backgroundcolour )
+        accuracyLabel = Label(second_frame, text="Nauwkeurigheid van model: "+str(getAccuracy(OutputDataframe))+"%", bg=backgroundcolour,font=('calibre',12, 'bold'))
         accuracyLabel.grid(padx=10,pady=5,row=1,column=1)
             
 def main():

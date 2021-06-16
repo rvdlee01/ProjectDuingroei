@@ -702,7 +702,7 @@ class GraphPage(ttk.Frame):
         downloadgraph.bind("<Leave>", lambda e: on_leave(e, orangecolour))
 
         downloadcsv = Button(second_frame,state = NORMAL, text="Download CSV", width=18, height=2, bg=orangecolour,
-                            command=lambda: [OutputDataframe.to_csv('downloads/PredictedOutputs{}.csv'.format(hashCodeCSV), index=False), messagebox.showinfo("Download succes", "Bestand opgeslagen in: downloads/PredictedOutputs{}.csv in de applicatie folder".format(hashCodeCSV))])
+                            command=lambda: [OutputDataframe.to_csv('downloads/ResultatenCSV{}.csv'.format(hashCodeCSV), index=False), messagebox.showinfo("Download succes", "Bestand opgeslagen in: downloads/ResultatenCSV{}.csv in de applicatie folder".format(hashCodeCSV))])
         downloadcsv.grid(padx=5,ipady=5,row=0,column=4)
         
         downloadcsv.bind("<Enter>", lambda e: on_enter(e, hovercolour))

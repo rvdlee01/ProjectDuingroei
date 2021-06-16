@@ -60,11 +60,18 @@ def model_NN(filename,inputX):
     
     y_dataset = scaler.fit_transform(np.array(y).reshape(-1,1))
 
-    model = keras.models.load_model('model')
+    model = keras.models.load_model('model') 
     
-    #predictions 
-    datasetPredict = model.predict(x_dataset)
-    inputPredict = model.predict(x_userinput) 
+    #predictions
+    try:
+        print("try")
+        datasetPredict = model.predict(x_dataset)
+        inputPredict = model.predict(x_userinput)
+    except:
+        print("except")
+        exec(open('model.py').read())
+        datasetPredict = model.predict(x_dataset)
+        inputPredict = model.predict(x_userinput) 
     years = df['jaar'].tolist()
     
     #convert np arrays to list and add the training and testing results together in a list

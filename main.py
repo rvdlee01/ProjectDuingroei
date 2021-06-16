@@ -452,11 +452,11 @@ class Mainscreen(ttk.Frame):
                 for row in df_rows:
                     for i in row:
                         if(count != indexNeerslag):
-                            row[count] = int(i)
+                            if(math.isnan(row[count]) == False):
+                                row[count] = int(i)
                             count+=1
                     count = 0
                     tv1.insert("", "end", values=row)
-
                 # list with column names of user
                 list_of_column_names = list(df.columns)
                 check_list = ['jaar', ycolumnname] + xcolumnnames

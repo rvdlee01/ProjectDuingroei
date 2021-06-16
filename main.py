@@ -122,9 +122,10 @@ class Mainscreen(ttk.Frame):
         super().__init__(container, *args, **kwargs)
         main_frame = Frame(container)
         main_frame.pack(fill=BOTH, expand=1)
-
+        
         my_canvas = Canvas(main_frame, bg=backgroundcolour)
         my_canvas.pack(side=LEFT, fill=BOTH, expand=1)
+        
 
         second_frame = Frame(my_canvas, bg=backgroundcolour)
 
@@ -561,7 +562,7 @@ def plotGraph(a,b,f,canvas,startpage,tv2,csvTable2):
 
     canvas.draw()
     canvas.get_tk_widget().grid(pady=25,row=2,columnspan=3)
-
+    
     for i in tv2.get_children():
         tv2.delete(i)
 
@@ -674,7 +675,7 @@ class GraphPage(ttk.Frame):
 def main():
     root = tk.Tk()
     root.geometry('1550x800')
-
+    root.resizable(False,False)
     Mainscreen(root)
     
     root.minsize(900,700)

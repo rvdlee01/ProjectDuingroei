@@ -30,6 +30,9 @@ xcolumnnames = ['windkracht6','windkracht7','windkracht8','windkracht9','windkra
 ycolumnname = 'duinhoogte'
 hovercolour = "LightBlue2"
 buttoncolour = "snow"
+bluecolour = "royalblue"
+salmoncolour = "salmon"
+orangecolour = "orange"
 
 def detect_outlier(data):
     outliers = []
@@ -151,12 +154,12 @@ class Mainscreen(ttk.Frame):
                            )
                        )
 
-        predictbutton = Button(second_frame, text="Voorspellen", width=18, bg=buttoncolour,
+        predictbutton = Button(second_frame, text="Voorspellen", width=18, height=2, bg=hovercolour,
                             command=lambda: checkInputs())
         predictbutton.grid(row=0,column=2,padx=10,pady=15,ipady=5)
-        predictbutton.bind("<Enter>", lambda e: on_enter(e, hovercolour))
-        predictbutton.bind("<Leave>", lambda e: on_leave(e, buttoncolour))
-        uploadbutton = Button(second_frame, text="CSV bestand selecteren", width=18, bg=buttoncolour,
+        predictbutton.bind("<Enter>", lambda e: on_enter(e, bluecolour))
+        predictbutton.bind("<Leave>", lambda e: on_leave(e, hovercolour))
+        uploadbutton = Button(second_frame, text="CSV bestand selecteren", width=18, height=2, bg=buttoncolour,
                             command=lambda: getCsvFile(uploadbutton, predictbutton, tv1))
         uploadbutton.grid(row=0,column=1,padx=10,pady=15,ipady=5)
         uploadbutton.bind("<Enter>", lambda e: on_enter(e, hovercolour))
@@ -173,7 +176,7 @@ class Mainscreen(ttk.Frame):
                 helpWindow = Toplevel(root, bg=backgroundcolour)
                 helpWindow.title("Hulppagina")
                 helpWindow.geometry("700x600")
-
+                helpWindow.resizable(False, False)
                 #create scrollable frame for new window
                 help_main_frame = Frame(helpWindow)
                 help_main_frame.pack(fill=BOTH, expand=1)
@@ -219,10 +222,10 @@ class Mainscreen(ttk.Frame):
 
         self.helppageactived = False
         self.helppage = None
-        helpbutton = Button(second_frame, text ="Hulp nodig?", bg=buttoncolour, width=18, command = lambda: [helppage(container)])
+        helpbutton = Button(second_frame, text ="Hulp nodig?", bg=salmoncolour, width=18, height=2, command = lambda: [helppage(container)])
         helpbutton.grid(row=0,column=3,padx=10,pady=15,ipady=5)
-        helpbutton.bind("<Enter>", lambda e: on_enter(e, hovercolour))
-        helpbutton.bind("<Leave>", lambda e: on_leave(e, buttoncolour))
+        helpbutton.bind("<Enter>", lambda e: on_enter(e, orangecolour))
+        helpbutton.bind("<Leave>", lambda e: on_leave(e, salmoncolour))
         
         listOfInputVariables = ['year','wp6','wp7','wp8','wp9','wp10','wp11','wp12','north','east','south','west','northeast','southeast','southwest','northwest','highhumidity','lowhumidity','avghumidity','precipitation']
         listOfWP = ['wp6','wp7','wp8','wp9','wp10','wp11','wp12']
@@ -638,28 +641,30 @@ class GraphPage(ttk.Frame):
 
         OutputDataframe = plotGraph(a,b,f,canvas,start_page,tv2,csvTable2)
 
-        homebutton = Button(second_frame,state = NORMAL, text="Terug naar startpagina", width=18, bg=buttoncolour,
+        homebutton = Button(second_frame,state = NORMAL, text="Terug naar startpagina", width=30, height=2, bg=buttoncolour,
                             command=lambda: [my_canvas.pack_forget(),csvTable2.grid_forget(),canvas.get_tk_widget().pack_forget(),clearGraphpage(canvas),my_scrollbar.pack_forget(),plot_frame.pack_forget(),Mainscreen(container)])
         homebutton.grid(padx=10,pady=15,ipady=5,row=0,column=1)
         
         homebutton.bind("<Enter>", lambda e: on_enter(e, hovercolour))
         homebutton.bind("<Leave>", lambda e: on_leave(e, buttoncolour))
 
-        downloadgraph = Button(second_frame,state = NORMAL, text="Download grafiek", width=18, bg=buttoncolour,
+
+        downloadgraph = Button(second_frame,state = NORMAL, text="Download grafiek", width=30, height=2, bg=buttoncolour,
                             command=lambda: [f.savefig('downloads/duingroeivoorspelling.png', dpi=100), messagebox.showinfo("Download successvol", "Bestand opgeslagen naar: downloads/duingroeivoorspelling.png in de application folder")])
+
         downloadgraph.grid(padx=10,ipady=5,row=1,column=0)
         
         downloadgraph.bind("<Enter>", lambda e: on_enter(e, hovercolour))
         downloadgraph.bind("<Leave>", lambda e: on_leave(e, buttoncolour))
 
-        downloadcsv = Button(second_frame,state = NORMAL, text="Download CSV", width=18, bg=buttoncolour,
+        downloadcsv = Button(second_frame,state = NORMAL, text="Download CSV", width=30, height=2, bg=buttoncolour,
                             command=lambda: [OutputDataframe.to_csv('downloads/PredictedOutputs.csv', index=False), messagebox.showinfo("Download successvol", "Bestand opgeslagen naar: downloads/PredictedOutputs.csv in de applicatie folder")])
         downloadcsv.grid(padx=10,ipady=5,row=1,column=2)
         
         downloadcsv.bind("<Enter>", lambda e: on_enter(e, hovercolour))
         downloadcsv.bind("<Leave>", lambda e: on_leave(e, buttoncolour))
 
-        showbarplot = Button(second_frame,state = NORMAL, text="Laat histogram zien", width=18, bg=buttoncolour,
+        showbarplot = Button(second_frame,state = NORMAL, text="Laat histogram zien", width=30, height=2, bg=buttoncolour,
                             command=lambda: [hideGraph(canvas,a,b, showbarplot)])
         showbarplot.grid(padx=10,ipady=5,row=1,column=3)
 
@@ -679,7 +684,7 @@ class GraphPage(ttk.Frame):
             
 def main():
     root = tk.Tk()
-    root.geometry('1500x800')
+    root.geometry('1550x800')
 
     Mainscreen(root)
     

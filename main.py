@@ -541,8 +541,8 @@ def plotGraph(a,b,f,canvas,startpage,tv2,csvTable2):
     a.plot(datasetPredictedx, datasetPredictedy,label='Voorspelde waarde',color='lightsalmon')
     a.plot(datasetActualx, datasetActualy,label='Daadwerkelijke waarde',color='turquoise')
     a.scatter(userOutputx,userOutputy,label='Voorspelde invoergegevens van gebruiker',color='royalblue')
-
-    a.legend()
+    
+    a.legend()  
     a.set_xlabel('jaar',labelpad=10)
     a.set_ylabel('duinhoogte [cm]',labelpad=10)
     
@@ -579,7 +579,7 @@ def plotGraph(a,b,f,canvas,startpage,tv2,csvTable2):
     b.bar(r1, bars1, color='turquoise', width=barWidth, edgecolor='white', label='Daadwerkelijke waarde')
     b.bar(r2, bars2, color='lightsalmon', width=barWidth, edgecolor='white', label='Voorspelde waarde')
     b.bar(r3, bars3, color='royalblue', width=barWidth, edgecolor='white', label='Voorspelde invoergegevens van gebruiker')
-    
+    b.set_ylim([0,2000])
     # Create legend
     b.set_xlabel('jaar',labelpad=10)
     b.set_ylabel('duinhoogte [cm]',labelpad=10)

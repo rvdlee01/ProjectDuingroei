@@ -593,10 +593,11 @@ def saveGraph(fig,lineGraph,histoGraph,hashCodeLineGraph,hashCodeHistoGraph):
     if (lineGraph.get_visible()):
         extent = lineGraph.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
         fig.savefig('downloads/duingroeivoorspelling{}.png'.format(hashCodeLineGraph),bbox_inches=extent,dpi=100)
+        messagebox.showinfo("Download succes", "Bestand opgeslagen in: downloads/duingroeivoorspelling{}.png in de applicatie folder".format(hashCodeLineGraph))
     else:
         extent = histoGraph.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
         fig.savefig('downloads/duingroeivoorspelling{}.png'.format(hashCodeHistoGraph),bbox_inches=extent,dpi=100)
-    messagebox.showinfo("Download succes", "Bestand opgeslagen in: downloads/duingroeivoorspelling{}.png in de applicatie folder".format)
+        messagebox.showinfo("Download succes", "Bestand opgeslagen in: downloads/duingroeivoorspelling{}.png in de applicatie folder".format(hashCodeHistoGraph))
 
 class GraphPage(ttk.Frame):
     def __init__(self, container, start_page, *args, **kwargs):
@@ -652,6 +653,7 @@ class GraphPage(ttk.Frame):
 
         hashCodeLineGraph = uuid.uuid4().hex
         hashCodeHistoGraph = uuid.uuid4().hex
+        hashCodeCSV = uuid.uuid4().hex
 
         OutputDataframe = plotGraph(a,b,f,canvas,start_page,tv2,csvTable2)
 
@@ -671,7 +673,7 @@ class GraphPage(ttk.Frame):
         downloadgraph.bind("<Leave>", lambda e: on_leave(e, buttoncolour))
 
         downloadcsv = Button(second_frame,state = NORMAL, text="Download CSV", width=18, bg=buttoncolour,
-                            command=lambda: [OutputDataframe.to_csv('downloads/PredictedOutputs.csv', index=False), messagebox.showinfo("Download succes", "Bestand opgeslagen in: downloads/PredictedOutputs.csv in de applicatie folder")])
+                            command=lambda: [OutputDataframe.to_csv('downloads/PredictedOutputs{}.csv'.format(hashCodeCSV), index=False), messagebox.showinfo("Download succes", "Bestand opgeslagen in: downloads/PredictedOutputs{}.csv in de applicatie folder".format(hashCodeCSV))])
         downloadcsv.grid(padx=10,ipady=5,row=1,column=2)
         
         downloadcsv.bind("<Enter>", lambda e: on_enter(e, hovercolour))

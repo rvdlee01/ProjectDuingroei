@@ -3,6 +3,7 @@ import matplotlib
 matplotlib.use("TkAgg")
 import pandas as pd
 import uuid
+import math
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from matplotlib.figure import Figure
@@ -602,8 +603,9 @@ def plotGraph(a,b,f,canvas,startpage,tv2,csvTable2):
         row[-1] = round(row[-1],1)
         for i in row:
             if(count < 3):
-                row[count] = int(i)
-                count+=1
+                if(math.isnan(row[count]) == False):
+                    row[count] = int(i)
+                    count+=1
         count = 0
         tv2.insert("", "end", values=row)
 

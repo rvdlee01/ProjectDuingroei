@@ -640,14 +640,14 @@ class GraphPage(ttk.Frame):
         homebutton.bind("<Leave>", lambda e: on_leave(e, buttoncolour))
 
         downloadgraph = Button(second_frame,state = NORMAL, text="Download grafiek", width=18, bg=buttoncolour,
-                            command=lambda: [f.savefig('downloads/duingroeivoorspelling.png', dpi=100)])
+                            command=lambda: [f.savefig('downloads/duingroeivoorspelling.png', dpi=100), messagebox.showinfo("Download success", "File saved to: downloads/duingroeivoorspelling.png in the application folder")])
         downloadgraph.grid(padx=10,ipady=5,row=1,column=0)
         
         downloadgraph.bind("<Enter>", lambda e: on_enter(e, hovercolour))
         downloadgraph.bind("<Leave>", lambda e: on_leave(e, buttoncolour))
 
-        downloadcsv = Button(second_frame,state = NORMAL, text="Download csv", width=18, bg=buttoncolour,
-                            command=lambda: [OutputDataframe.to_csv('downloads/PredictedOutputs.csv', index=False)])
+        downloadcsv = Button(second_frame,state = NORMAL, text="Download CSV", width=18, bg=buttoncolour,
+                            command=lambda: [OutputDataframe.to_csv('downloads/PredictedOutputs.csv', index=False), messagebox.showinfo("Download success", "File saved to: downloads/PredictedOutputs.csv in the application folder")])
         downloadcsv.grid(padx=10,ipady=5,row=1,column=2)
         
         downloadcsv.bind("<Enter>", lambda e: on_enter(e, hovercolour))

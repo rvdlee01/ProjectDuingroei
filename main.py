@@ -418,8 +418,8 @@ class Mainscreen(ttk.Frame):
                     if (boolYear):
                         df = df.sort_values(by=['jaar'])
                 else:
-                    boolYear,missingyears = False, "Het bestand bevat geen kolom 'jaar'"
-                    
+                    boolYear,missingyears = False, "Het bestand bevat geen kolom 'jaar'"  
+                      
                 #clear treeview
                 for row in tv1.get_children():
                     tv1.delete(row)
@@ -640,14 +640,14 @@ class GraphPage(ttk.Frame):
         homebutton.bind("<Leave>", lambda e: on_leave(e, buttoncolour))
 
         downloadgraph = Button(second_frame,state = NORMAL, text="Download grafiek", width=18, bg=buttoncolour,
-                            command=lambda: [f.savefig('downloads/duingroeivoorspelling.png', dpi=100), messagebox.showinfo("Download success", "File saved to: downloads/duingroeivoorspelling.png in the application folder")])
+                            command=lambda: [f.savefig('downloads/duingroeivoorspelling.png', dpi=100), messagebox.showinfo("Download successvol", "Bestand opgeslagen naar: downloads/duingroeivoorspelling.png in de application folder")])
         downloadgraph.grid(padx=10,ipady=5,row=1,column=0)
         
         downloadgraph.bind("<Enter>", lambda e: on_enter(e, hovercolour))
         downloadgraph.bind("<Leave>", lambda e: on_leave(e, buttoncolour))
 
         downloadcsv = Button(second_frame,state = NORMAL, text="Download CSV", width=18, bg=buttoncolour,
-                            command=lambda: [OutputDataframe.to_csv('downloads/PredictedOutputs.csv', index=False), messagebox.showinfo("Download success", "File saved to: downloads/PredictedOutputs.csv in the application folder")])
+                            command=lambda: [OutputDataframe.to_csv('downloads/PredictedOutputs.csv', index=False), messagebox.showinfo("Download successvol", "Bestand opgeslagen naar: downloads/PredictedOutputs.csv in de applicatie folder")])
         downloadcsv.grid(padx=10,ipady=5,row=1,column=2)
         
         downloadcsv.bind("<Enter>", lambda e: on_enter(e, hovercolour))

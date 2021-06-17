@@ -1,51 +1,55 @@
 HOE MAAKT U EEN DUINGROEI VOORSPELLING STAP VOOR STAP
 
 Op de onderstaande pagina wordt uitgelegd hoe u een voorspelling maakt met behulp van uw eigen csv bestand.
-Wanneer u de onderstaande stappen volgt kunt u gemakkelijk een kamer boeken.
+Wanneer u de onderstaande stappen volgt kunt u gemakkelijk een duingroei voorspelling maken.
 
 ___________               
 Startpagina
 ___________
-Op de startpagina ziet de volgende drie knoppen.
-	Upload csv bestand: door op deze knop te drukken kunt u een csv bestand uploaden. In de eerste stap zal 
-	beschreven worden hoe u een csv-bestand kunt uploaden en wat de eisen zijn voor het uploaden van een 
-	bestand.
-	Voorspellen: wanneer u alle velden heeft ingevuld en een correcte csv-bestand hebt geupload kunt u op 
-	deze knop drukken om de duingroei voor een jaar te voorspellen. 
-	Hulp: om hulp te krijgen bij het maken van een voorspelling kunt u altijd gebruik maken van deze knop.
+Op de startpagina ziet u de volgende drie knoppen.
+CSV bestand selecteren: door op deze knop te drukken kunt u een csv bestand uploaden. 
+In de eerste stap zal beschreven worden hoe u een csv-bestand kunt uploaden en wat de eisen zijn 
+voor het uploaden van een bestand.
+ 
+Voorspellen: wanneer u alle velden heeft ingevuld en een correcte csv-bestand hebt geupload 
+kunt u op deze knop drukken om de duingroei voor een jaar te voorspellen.
+
+Hulp nodig?: om hulp te krijgen bij het maken van een voorspelling kunt u altijd gebruik maken van deze knop.
+
 ________________
 Resultatenpagina
 ________________
-Op de resultatenpagina vindt u een grafiek waarin de resultaten van de voorspellingen zijn weergegeven. Onder de
-grafiek bevindt zich een tabel met ook daarin de resultaten. 
-Daarnaast heeft u de mogelijkheid om de grafiek te personaliseren door de resultaten te weergeven in een 
-histogram in plaats van een lijngrafiek en kunt u de grafiek en/of tabel downloaden om de resultaten te bewaren. 
+Op de resultatenpagina  vindt u een grafiek waarin de resultaten van de voorspellingen zijn weergegeven. 
+Onder de grafiek bevindt zich een tabel met ook daarin de resultaten.
+Daarnaast heeft u de mogelijkheid om de grafiek te personaliseren door de resultaten te weergeven in een
+histogram in plaats van een lijngrafiek en kunt u de grafieken en/of tabel downloaden om de resultaten te bewaren.
 
 ______________________________                    
 Stap 1. CSV-bestand selecteren
 ______________________________
-1) Klik op de knop 'upload csv-bestand'
+1) Klik op de knop 'CSV bestand selecteren'
 2) Selecteer een csv-bestand
 3) Wacht tot de applicatie uw csv-bestand heeft gevalideerd
-4) De knop zal groen kleuren wanneer het csv-bestand aan de eisen voldoet.
-   De knop zal rood kleuren wanneer het csv-bestand niet aan de eisen voldoet.
-	Tip: bij een ongeldig bestand neem de eisen door waar het bestand aan moet voldoen.
-5) U zult vervolgens de gegevens van het bestand in de witte vak van de pagina zien onder 'csv data' ongeacht of 
+4) De knop zal groen kleuren wanneer het csv-bestand aan de eisen voldoet. 
+   Als het bestand voldoet aan de eisen ontvangt u een bericht dat het bestand is goedgekeurd.
+   De knop zal rood kleuren wanneer het csv-bestand niet aan de eisen voldoet. 
+   Als het bestand niet voldoet aan de eisen ontvangt u een bericht met daarin wat er fout is aan het bestand.
+       Tip: neem bij een ongeldig bestand de eisen door waar het bestand aan moet voldoen.
+5) U zult vervolgens de gegevens van het bestand in het preview vak van de pagina zien onder 'csv data' ongeacht of 
 het bestand aan de eisen voldoet of niet.
 
 De csv-bestand moet aan de volgende eisen voldoen:
-	1. Het bestand moet de volgende 19 kolommen bevatten.
-		jaar in jaren
-		duinhoogte in cm per jaar
-		windkracht6,windkracht7,windkracht8,windkracht9,windkracht10,windkracht11,windkracht12 in 
-		aantal dagen
-		noord,oost,zuid,west,noord-oosten,zuid-oosten,zuid-westen,noord-westen in aantal dagen
-		hogeluchtvochtigheid,lageluchtvochtigheid,gemiddeldeluchtvochtigheid in aantal dagen
-		neerslag in mm per jaar
-	let op dat de aantal dagen met windkracht 6-12 gelijk moet zijn aan de dagen met de windrichtingen 
-	en de luchtvochtigheid.
-	2. Het bestand mag geen ontbrekende waarden bevatten zoals lege velden of missende jaren.
-	
+    1. Het bestand moet de volgende 19 kolommen bevatten.
+        jaar in jaren
+        duinhoogte in cm per jaar
+        windkracht6 tot en met windkracht12 in aantal dagen                    
+        noord,oost,zuid,west,noord-oosten,zuid-oosten,zuid-westen,noord-westen in aantal dagen
+        hogeluchtvochtigheid,lageluchtvochtigheid,gemiddeldeluchtvochtigheid in aantal dagen
+        neerslag in mm per jaar
+        let op dat de aantal dagen met windkracht 6 tot en met 12 gelijk moet zijn aan de totaal aantal dagen
+        in de windrichtingen en de luchtvochtigheid kolommen.
+    2. Het bestand mag geen ontbrekende waarden bevatten zoals lege velden of missende jaren.
+    3. Het bestand moet minimaal 10 rijen aan gegevens bevatten.
 ___________________
 Stap 2. Invulvelden
 ___________________
@@ -64,22 +68,25 @@ Het totaal aantal dagen bij luchtvochtigheid moet gelijk zijn aan het totaal aan
 ___________________
 Stap 3. Voorspellen
 ___________________
-Wanneer alle velden ingevuld zijn en u een csv-bestand hebt geupload kunt u op de knop 'voorspellen' klikken. 
+Wanneer alle velden ingevuld zijn en u een csv-bestand hebt geupload kunt u op de knop 'Voorspellen' klikken. 
 Wacht enkele seconden voor de applicatie om de model toe te passen voor het voorspellen van de duingroei.
 
-U zult vervolgens naar de resultaten pagina worden geleidt waar de voorspelling in een grafiek en tabel af te lezen is.
+U zult vervolgens naar de resultatenpagina worden geleidt waar de voorspelling in een grafiek en tabel af te lezen is.
 ______________________
 Stap 4. Personaliseren
 ______________________
-Op de resultatenpagina kunt u ervoor kiezen om de resultaten te weergeven in een histogram in plaats van een 
-lijngrafiek.
-Dit kunt u doen door op de histogram optie te klikken rechts van de pagina.
+Op de resultatenpagina kunt u ervoor kiezen om de resultaten te weergeven in een histogram in plaats van 
+een lijngrafiek.
+Dit kunt u doen door op 'Laat histogram zien' te klikken rechtsboven op de pagina. 
+Om terug te gaan de originele grafiek klikt u op 'Laat grafiek zien'.
 _____________________________
 Stap 5. Resultaten downloaden
 _____________________________
-Om de resultaten op te slaan kunt u ervoor kiezen om de grafiek als een png bestand op te slaan en/of de tabel 
+Om de resultaten op te slaan kunt u ervoor kiezen om de grafiek als een png bestand op te slaan en/of de tabel
 als een csv-bestand.
 1) Selecteer een van de download opties.
-	Download optie 1: download grafiek als een png afbeelding
-	Download optie 2: download tabel als een csv-bestand
-2) U kunt de gedownloade bestand in de folder vinden van waar de applicatie zit.
+    Download optie 1: download grafiek als een png afbeelding
+    Tip: Als u de histogram wilt downloaden dan moet u eerst op 'Laat histogram zien' klikken en 
+    vervolgens op 'Download grafiek'.
+    Download optie 2: download tabel als een csv-bestand
+2) U krijgt vervolgens een bevestigingsbericht met daarin informatie over waar het bestand is opgeslagen.
